@@ -9,7 +9,7 @@ var Parser = function(str) {
 };
 
 Parser.prototype.exp = function() {
-    return this._sexp() || this._symbol() || this._number();
+    return this._sexp() || this._symbol() || this._number() || this._string();
 };
 
 var sys = require("sys");
@@ -54,4 +54,10 @@ Parser.prototype._number = function() {
     var tok = this._tok(/[0-9]*(\.[0-9]+)/);
     if (!tok) return false;
     else return +tok[0];
+};
+
+Parser.prototype._string = function() {
+    var tok = this._tok(/"((?:[^"]|\\.)*)"/);
+    if (!tok) return false;
+    else return tok[1].replace(/\\[ \n]/g, "").replace(/\\(.)/g, '$1');
 };
