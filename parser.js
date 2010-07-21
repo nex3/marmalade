@@ -12,8 +12,6 @@ Parser.prototype.exp = function() {
     return this._sexp() || this._symbol() || this._number() || this._string();
 };
 
-var sys = require("sys");
-
 Parser.prototype._tok = function(rx) {
     var match = this._str.match(new RegExp("^" + rx.source));
     if (!match) return false;
