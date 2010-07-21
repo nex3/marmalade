@@ -68,7 +68,7 @@ exports.parse = function(elisp) {
     parsedVersion = parseVersion(version);
 
     return {
-        filename: filename,
+        name: filename,
         description: desc,
         commentary: commentary,
         requires: parsedRequires,
