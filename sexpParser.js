@@ -1,4 +1,4 @@
-exports.parseSexp = function(str) {
+exports.parse = function(str) {
     var parser = new Parser(str);
     return parser.exp();
 };
