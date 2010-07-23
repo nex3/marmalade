@@ -4,9 +4,13 @@ var fs = require("fs"),
 
 var pkgDir = __dirname + '/packages';
 
+function pkgFile(pkg) {
+    return pkgDir + '/' + pkg.name + '-' + pkg.version.join(".") + ".el";
+};
+
 exports.savePackage = function(elisp, callback) {
     var pkg = packageParser.parse(elisp);
-    fs.open(pkgDir + '/' + pkg.name + ".el", "w", 0600, function(err, fd) {
+    fs.open(pkgFile(pkg), "w", 0600, function(err, fd) {
         if (err) return callback(err, pkg);
         fs.write(fd, elisp, null, "utf8", function(err, written) {
             callback(err, pkg)
