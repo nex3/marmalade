@@ -2,9 +2,11 @@ var fs = require("fs"),
     _ = require("underscore")._,
     packageParser = require("./packageParser");
 
+var pkgDir = __dirname + '/packages';
+
 exports.savePackage = function(elisp, callback) {
     var pkg = packageParser.parse(elisp);
-    fs.open("packages/" + pkg.name + ".el", "w", 0600, function(err, fd) {
+    fs.open(pkgDir + '/' + pkg.name + ".el", "w", 0600, function(err, fd) {
         if (err) return callback(err, pkg);
         fs.write(fd, elisp, null, "utf8", function(err, written) {
             callback(err, pkg)
@@ -20,7 +22,7 @@ exports.getPackages = function(callback) {
         var errors = [];
         var filesToParse = 0;
         _(files).each(function(file) {
-            file = 'packages/' + file;
+            file = pkgDir + '/' + file;
             filesToParse += 1;
             fs.readFile(file, "utf8", function(err, data) {
                 if (err) {
