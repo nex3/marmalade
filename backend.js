@@ -1,4 +1,5 @@
 var fs = require("fs"),
+    _ = require("underscore")._,
     packageParser = require("./packageParser");
 
 exports.savePackage = function(elisp, callback) {
@@ -18,8 +19,8 @@ exports.getPackages = function(callback) {
         var packages = [];
         var errors = [];
         var filesToParse = 0;
-        for (var i = 0; i < files.length; i++) {
-            var file = 'packages/' + files[i];
+        _(files).each(function(file) {
+            file = 'packages/' + file;
             filesToParse += 1;
             fs.readFile(file, "utf8", function(err, data) {
                 if (err) {
@@ -31,6 +32,6 @@ exports.getPackages = function(callback) {
                 filesToParse -= 1;
                 if (filesToParse === 0) callback(null, packages);
             });
-        }
+        });
     });
 };

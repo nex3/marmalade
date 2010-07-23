@@ -1,4 +1,5 @@
-var sexpParser = require("./sexpParser");
+var _ = require("underscore")._,
+    sexpParser = require("./sexpParser");
 
 function escape(str) {
     return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -33,10 +34,7 @@ function stripRCS(str) {
 };
 
 function parseVersion(str) {
-    var nums = [];
-    var split = str.split(".");
-    for (var i = 0; i < split.length; i++) nums.push(+split[i]);
-    return nums;
+    return _(str.split(".")).map(Number);
 };
 
 
@@ -59,19 +57,18 @@ exports.parse = function(elisp) {
         throw 'Package does not have a "Version" or "Package-Version" header';
     var commentary = getSection(elisp, /commentary|documentation/);
 
-    var parsedRequires = [];
     if (requires) {
-        var arr = sexpParser.parse(requires);
-        for (var i = 0; i < arr.length; i++)
-            parsedRequires.push([arr[i][0], parseVersion(arr[i][1])]);
+        requires = _(sexpParser.parse(requires)).map(function(require) {
+            return [require[0], parseVersion(require[1])]
+        });
     }
-    parsedVersion = parseVersion(version);
+    version = parseVersion(version);
 
     return {
         name: filename,
         description: desc,
         commentary: commentary,
-        requires: parsedRequires,
-        version: parsedVersion
+        requires: requires,
+        version: version
     };
 };
