@@ -55,5 +55,9 @@ exports.create = function(middleware) {
         });
     });
 
+    app.get('/packages/builtin-packages', function(req, res) {
+        res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
+    });
+
     return app;
 };
