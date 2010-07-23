@@ -8,6 +8,7 @@ exports.create = function(middleware) {
         connect.errorHandler(),
         connect.conditionalGet()
     );
+    app.use('/packages', connect.staticProvider(__dirname + '/packages'));
 
     app.addListener('listening', function() {
         var address = app.address();
