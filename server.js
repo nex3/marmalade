@@ -1,5 +1,8 @@
 var connect = require("connect"),
-    express = require("express");
+    express = require("express"),
+    mustache = require("mustache"),
+    backend = require("./backend"),
+    helpers = require("./helpers");
 
 exports.create = function(middleware) {
     var app = express.createServer(
@@ -19,6 +22,16 @@ exports.create = function(middleware) {
 
     app.get('/', function(req, res) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
+    });
+
+    app.get('/packages/archive-contents', function(req, res) {
+        backend.getPackages(function(err, pkgs) {
+            if (err) throw err;
+            res.render("archive-contents.ejs", {
+                locals: helpers.extend({packages: pkgs}),
+                layout: false
+            });
+        });
     });
 
     return app;
