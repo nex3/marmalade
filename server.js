@@ -11,7 +11,6 @@ exports.create = function(middleware) {
         connect.errorHandler(),
         connect.conditionalGet()
     );
-    app.use('/packages', connect.staticProvider(__dirname + '/packages'));
 
     app.addListener('listening', function() {
         var address = app.address();
@@ -22,6 +21,23 @@ exports.create = function(middleware) {
 
     app.get('/', function(req, res) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
+    });
+
+    app.get(/^\/packages\/(.*)-([0-9.]+)\.el$/, function(req, res, params) {
+        var name = params.splat[0];
+        var version = params.splat[1];
+        backend.loadPackage(
+            name, _.map(version.split("."), Number), function(err, elisp) {
+                if (err) {
+                    if (err.name === "WrongVersionError") {
+                        res.send(err.message, {'Content-Type': 'text/plain'}, 404);
+                        return;
+                    }
+                    throw err;
+                }
+
+                res.send(elisp, {'Content-Type': 'text/plain'});
+            });
     });
 
     app.get('/packages/archive-contents', function(req, res) {
