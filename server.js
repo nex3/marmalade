@@ -31,9 +31,12 @@ exports.create = function(middleware) {
                 if (err) {
                     if (err.name === "WrongVersionError") {
                         res.send(err.message, {'Content-Type': 'text/plain'}, 404);
-                        return;
+                    } else if (err.errno === process.ENOENT) {
+                        res.send("Don't have any version of " + name + ".el\n", 404);
+                    } else {
+                        throw err;
                     }
-                    throw err;
+                    return;
                 }
 
                 res.send(elisp, {'Content-Type': 'text/plain'});
