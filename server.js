@@ -30,6 +30,8 @@ exports.create = function(middleware) {
             res.render("archive-contents.ejs", {
                 locals: helpers.extend({packages: pkgs}),
                 layout: false
+            }, function(err, str) {
+                res.send(str, {'Content-Type': 'text/plain'});
             });
         });
     });
