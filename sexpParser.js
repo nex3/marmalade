@@ -45,7 +45,7 @@ Parser.prototype._sexp = function() {
 Parser.prototype._symbol = function() {
     var tok = this._tok(/([^0-9.#"'()\[\]\\`\s]|\\.)([^#"'()\[\]\\`\s]|\\.)*/);
     if (!tok) return false;
-    else return tok[0];
+    else return tok[0].replace(/\\(.)/g, '$1');
 };
 
 Parser.prototype._number = function() {
