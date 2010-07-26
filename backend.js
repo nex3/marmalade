@@ -1,4 +1,5 @@
 var fs = require("fs"),
+    step = require("step"),
     _ = require("underscore")._,
     packageParser = require("./packageParser");
 
@@ -10,12 +11,13 @@ function pkgFile(name) {
 
 exports.savePackage = function(elisp, callback) {
     var pkg = packageParser.parse(elisp);
-    fs.open(pkgFile(pkg.name), "w", 0600, function(err, fd) {
-        if (err) return callback(err, pkg);
-        fs.write(fd, elisp, null, "utf8", function(err, written) {
-            callback(err, pkg)
-        });
-    });
+    step(
+        function() {fs.open(pkgFile(pkg.name), "w", 0600, this)},
+        function(err, fd) {
+          if (err) throw err;
+          fs.write(fd, elisp, null, "utf8", this)
+        },
+        function(err, written) {callback(err, pkg)});
 };
 
 exports.loadPackage = function(name, version, callback) {
@@ -37,25 +39,19 @@ exports.loadPackage = function(name, version, callback) {
 };
 
 exports.getPackages = function(callback) {
-    fs.readdir('packages', function(err, files) {
-        if (err) return callback(err, []);
+    step(
+        function() {fs.readdir('packages', this)},
+        function(err, files) {
+          if (err) throw err;
 
-        var packages = [];
-        var errors = [];
-        var filesToParse = 0;
-        _(files).each(function(file) {
-            file = pkgDir + '/' + file;
-            filesToParse += 1;
-            fs.readFile(file, "utf8", function(err, data) {
-                if (err) {
-                    console.log("Error reading " + file + ": " + err);
-                } else {
-                    packages.push(packageParser.parse(data));
-                }
-
-                filesToParse -= 1;
-                if (filesToParse === 0) callback(null, packages);
-            });
-        });
-    });
+          _(files).each(function(file) {
+            fs.readFile(pkgDir + '/' + file, "utf8", this.parallel());
+          });
+        },
+        function(err /*, elisps... */) {
+            if (err) throw(err);
+            var elisps = Array.prototype.slice.call(arguments, 1);
+            return _(elisps).map(packageParser.parse);
+        },
+        callback);
 };

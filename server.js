@@ -1,6 +1,7 @@
 var connect = require("connect"),
     express = require("express"),
     mustache = require("mustache"),
+    step = require("step");
     backend = require("./backend"),
     helpers = require("./helpers");
 
@@ -44,15 +45,19 @@ exports.create = function(middleware) {
     });
 
     app.get('/packages/archive-contents', function(req, res) {
-        backend.getPackages(function(err, pkgs) {
-            if (err) throw err;
-            res.render("archive-contents.ejs", {
-                locals: helpers.extend({packages: pkgs}),
-                layout: false
-            }, function(err, str) {
+        step(
+            function() {backend.getPackages(this)},
+            function(err, pkgs) {
+                if (err) throw err;
+                res.render("archive-contents.ejs", {
+                    locals: helpers.extend({packages: pkgs}),
+                    layout: false
+                }, this);
+            },
+            function(err, str) {
+                if (err) throw err;
                 res.send(str, {'Content-Type': 'text/plain'});
             });
-        });
     });
 
     app.get('/packages/builtin-packages', function(req, res) {
