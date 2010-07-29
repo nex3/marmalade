@@ -11,7 +11,7 @@ function pkgFile(name) {
 };
 
 exports.savePackage = function(elisp, callback) {
-    var pkg = packageParser.parse(elisp);
+    var pkg = packageParser.parseElisp(elisp);
     step(
         function() {fs.open(pkgFile(pkg.name), "w", 0600, this)},
         function(err, fd) {
@@ -24,7 +24,7 @@ exports.savePackage = function(elisp, callback) {
 exports.loadPackage = function(name, version, callback) {
     fs.readFile(pkgFile(name), "utf8", function(err, elisp) {
         if (err) return callback(err);
-        var pkg = packageParser.parse(elisp);
+        var pkg = packageParser.parseElisp(elisp);
         if (!_.isEqual(pkg.version, version)) {
             var err = new Error("Don't have " + name + ".el version " +
                                 version.join(".") + ", only version " +
@@ -58,14 +58,26 @@ exports.getPackages = function(callback) {
         function(err, files) {
             if (err) throw err;
 
+            var fileGroup = this.group();
             _(files).each(function(file) {
-                fs.readFile(pkgDir + '/' + file, "utf8", this.parallel());
+                var cb = fileGroup();
+                fs.readFile(pkgDir + '/' + file, function(err, data) {
+                    cb(null, [file, data]);
+                });
             });
         },
-        function(err /*, elisps... */) {
-            if (err) throw(err);
-            var elisps = Array.prototype.slice.call(arguments, 1);
-            return _(elisps).map(packageParser.parse);
+        function(err, packages) {
+            if (err) throw err;
+            var pkgGroup = this.group();
+            _(packages).each(function(pkg) {
+                var file = pkg[0],
+                    data = pkg[1];
+                if (file.match(/\.el$/)) {
+                    pkgGroup()(null, packageParser.parseElisp(data.toString('utf8')));
+                } else {
+                    packageParser.parseTar(data, pkgGroup());
+                }
+            });
         },
         callback);
 };

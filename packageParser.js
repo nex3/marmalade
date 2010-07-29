@@ -48,7 +48,7 @@ function parseVersion(str) {
 };
 
 
-exports.parse = function(elisp) {
+exports.parseElisp = function(elisp) {
     var startMatch = elisp.match(/^;;; ([^ ]*)\.el --- (.*)$/m);
     if (!startMatch) throw "No starting comment for package";
 
