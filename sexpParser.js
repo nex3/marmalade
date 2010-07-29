@@ -34,7 +34,7 @@ Parser.prototype._sexp = function() {
     this._ws();
     var val = [];
     var exp;
-    while (exp = this.exp()) {
+    while ((exp = this.exp())) {
         val.push(exp);
         this._ws();
     }
