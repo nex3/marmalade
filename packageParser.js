@@ -1,4 +1,7 @@
-var _ = require("underscore")._,
+var fs = require("fs"),
+    _ = require("underscore")._,
+    step = require("step"),
+    util = require("./util");
     sexpParser = require("./sexpParser");
 
 function escape(str) {
@@ -36,11 +39,11 @@ function stripRCS(str) {
 function parseRequires(str) {
     if (!str) return [];
     return _(sexpParser.parse(str)).map(function(require) {
-        return [require[0], exports.parseVersion(require[1])];
+        return [require[0], parseVersion(require[1])];
     });
 };
 
-exports.parseVersion = function(str) {
+function parseVersion(str) {
     return _(str.split(".")).map(Number);
 };
 
@@ -65,7 +68,7 @@ exports.parse = function(elisp) {
     var commentary = getSection(elisp, /commentary|documentation/);
 
     requires = parseRequires(requires);
-    version = exports.parseVersion(version);
+    version = parseVersion(version);
 
     return {
         name: filename,
@@ -77,14 +80,14 @@ exports.parse = function(elisp) {
     };
 };
 
-exports.parseDeclaration = function(elisp) {
+function parseDeclaration(elisp) {
     var sexp = sexpParser.parse(elisp);
     if (!_.isArray(sexp) || !sexp[0] === "define-package") {
         throw "Expected a call to define-package";
     }
 
     var name = sexp[1];
-    var version = exports.parseVersion(sexp[2]);
+    var version = parseVersion(sexp[2]);
     var desc = sexp[3];
     var requires = parseRequires(sexp[4]);
 
@@ -95,4 +98,63 @@ exports.parseDeclaration = function(elisp) {
         version: version,
         type: "tar"
     };
+};
+
+exports.parseTar = function(tar, callback) {
+    var tmpDir;
+    var name;
+    var version;
+    var pkg;
+    step(
+        function() {util.run("mktemp", ["-d", "-t", "jelly.XXXXXXXXXX"], this)},
+        function(err, output) {
+            if (err) throw err;
+            tmpDir = output.replace(/\n$/, "");
+            util.run("tar", ["--extract", "--directory", tmpDir], tar, this);
+        },
+        function(err) {
+            if (err) throw err;
+            fs.readdir(tmpDir, this);
+        },
+        function(err, files) {
+            if (err) throw err;
+            var match;
+            if (files.length !== 1 ||
+                !(match = files[0].match(/^(.+)-([0-9.]+)$/))) {
+                throw "ELPA archives must contain exactly one directory," +
+                    "named <package>-<version>";
+            }
+            name = match[1];
+            version = parseVersion(match[2]);
+            var pkgGroup = this.group()();
+            var readmeGroup = this.group()();
+            fs.readFile(tmpDir + "/" + files[0] + "/" + name + "-pkg.el", "utf8",
+                        function(err, elisp) {
+                            if (err) throw err;
+                            pkgGroup(null, parseDeclaration(elisp));
+                        });
+            fs.readFile(tmpDir + "/" + files[0] + "/README", "utf8",
+                        function(err, readme) {
+                            if (err) readmeGroup();
+                            readmeGroup(null, readme);
+                        });
+        },
+        function(err, pkg_, readme) {
+            if (err) throw err;
+            pkg = pkg_[0];
+            readme = readme[0];
+            if (!_.isEqual(pkg.name, name)) {
+                throw "Package name \"" + pkg.name + "\" in " + name + "-pkg.el" +
+                    " doesn't match archive name \"" + name + "\"!";
+            } else if (!_.isEqual(pkg.version, version)) {
+                throw "Package version \"" + pkg.version.join(".") + "\" in " +
+                    name + "-pkg.el doesn't match archive version \"" +
+                    version.join(".") + "\"!";
+            }
+
+            pkg.commentary = readme;
+            util.run("rm", ["-rf", tmpDir], function(){});
+            return pkg;
+        },
+        callback);
 };

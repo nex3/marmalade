@@ -1,6 +1,5 @@
 var fs = require("fs"),
     sys = require("sys"),
-    spawn = require("child_process").spawn,
     step = require("step"),
     _ = require("underscore")._,
     packageParser = require("./packageParser");
@@ -39,95 +38,18 @@ exports.loadPackage = function(name, version, callback) {
     });
 };
 
-function run(command, args, input, callback) {
-    if (callback === undefined) {
-        callback = input;
-        input = null;
-    }
-
-    console.log("Running " + command + " " + args.join(" "));
-    var child = spawn(command, args);
-    var stdout = [];
-    var stderr = [];
-    child.on('error', callback);
-    child.stdout.on('data', function(data) {stdout.push(data.toString('utf8'))});
-    child.stderr.on('data', function(data) {stderr.push(data.toString('utf8'))});
-    child.on('exit', function(code, signal) {
-        if (code !== 0) {
-            var err = new Error("Process " + command + " terminated unexpectedly.");
-            err.code = code;
-            err.signal = signal;
-            err.command = command;
-            err.args = args;
-            err.stderr = stderr.join();
-            err.stdout = stdout.join();
-            callback(err, err.stdout);
-            return;
-        }
-
-        callback(null, stdout.join());
-    });
-
-    if (input) child.stdin.end(input, 'utf8');
-};
-
 exports.saveTarball = function(tar, callback) {
-    var tmpDir;
-    var name;
-    var version;
     var pkg;
     step(
-        function() {run("mktemp", ["-d", "-t", "jelly.XXXXXXXXXX"], this)},
-        function(err, output) {
+        function() {packageParser.parseTar(tar, this)},
+        function(err, pkg_) {
             if (err) throw err;
-            tmpDir = output.replace(/\n$/, "");
-            run("tar", ["--extract", "--directory", tmpDir], tar, this);
-        },
-        function(err) {
-            if (err) throw err;
-            fs.readdir(tmpDir, this);
-        },
-        function(err, files) {
-            if (err) throw err;
-            var match;
-            if (files.length !== 1 ||
-                !(match = files[0].match(/^(.+)-([0-9.]+)$/))) {
-                throw "ELPA archives must contain exactly one directory," +
-                    "named <package>-<version>";
-            }
-            name = match[1];
-            version = packageParser.parseVersion(match[2]);
-            var pkgGroup = this.group()();
-            var readmeGroup = this.group()();
-            fs.readFile(tmpDir + "/" + files[0] + "/" + name + "-pkg.el", "utf8",
-                        function(err, elisp) {
-                            if (err) throw err;
-                            pkgGroup(null, packageParser.parseDeclaration(elisp));
-                        });
-            fs.readFile(tmpDir + "/" + files[0] + "/README", "utf8",
-                        function(err, readme) {
-                            if (err) readmeGroup();
-                            readmeGroup(null, readme);
-                        });
-        },
-        function(err, pkg_, readme) {
-            if (err) throw err;
-            pkg = pkg_[0];
-            readme = readme[0];
-            if (!_.isEqual(pkg.name, name)) {
-                throw "Package name \"" + pkg.name + "\" in " + name + "-pkg.el" +
-                    " doesn't match archive name \"" + name + "\"!";
-            } else if (!_.isEqual(pkg.version, version)) {
-                throw "Package version \"" + pkg.version.join(".") + "\" in " +
-                    name + "-pkg.el doesn't match archive version \"" +
-                    version.join(".") + "\"!";
-            }
-
-            pkg.commentary = readme;
-            run("rm", ["-rf", tmpDir], function(){});
+            pkg = pkg_;
             fs.writeFile(pkgDir + "/" + pkg.name + ".tar", tar, this);
         },
-        function(err) {callback(err, pkg)});
+        function(err) {
+            callback(err, pkg);
+        })
 };
 
 exports.getPackages = function(callback) {
