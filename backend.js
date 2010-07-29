@@ -16,8 +16,8 @@ exports.savePackage = function(elisp, callback) {
     step(
         function() {fs.open(pkgFile(pkg.name), "w", 0600, this)},
         function(err, fd) {
-          if (err) throw err;
-          fs.write(fd, elisp, null, "utf8", this)
+            if (err) throw err;
+            fs.write(fd, elisp, null, "utf8", this)
         },
         function(err, written) {callback(err, pkg)});
 };
@@ -134,11 +134,11 @@ exports.getPackages = function(callback) {
     step(
         function() {fs.readdir('packages', this)},
         function(err, files) {
-          if (err) throw err;
+            if (err) throw err;
 
-          _(files).each(function(file) {
-            fs.readFile(pkgDir + '/' + file, "utf8", this.parallel());
-          });
+            _(files).each(function(file) {
+                fs.readFile(pkgDir + '/' + file, "utf8", this.parallel());
+            });
         },
         function(err /*, elisps... */) {
             if (err) throw(err);
