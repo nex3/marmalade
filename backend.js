@@ -6,14 +6,14 @@ var fs = require("fs"),
 
 var pkgDir = __dirname + '/packages';
 
-function pkgFile(name) {
-    return pkgDir + '/' + name + ".el";
+function pkgFile(name, type) {
+    return pkgDir + '/' + name + "." + type;
 };
 
 exports.savePackage = function(elisp, callback) {
     var pkg = packageParser.parseElisp(elisp);
     step(
-        function() {fs.open(pkgFile(pkg.name), "w", 0600, this)},
+        function() {fs.open(pkgFile(pkg.name, 'el'), "w", 0600, this)},
         function(err, fd) {
             if (err) throw err;
             fs.write(fd, elisp, null, "utf8", this)
@@ -21,25 +21,29 @@ exports.savePackage = function(elisp, callback) {
         function(err, written) {callback(err, pkg)});
 };
 
-exports.loadPackage = function(name, version, callback) {
-    fs.readFile(pkgFile(name), "utf8", function(err, elisp) {
-        if (err) {
-            return;
-            callback(err);
-        }
+exports.loadPackage = function(name, version, type, callback) {
+    var data;
+    step(
+        function() {fs.readFile(pkgFile(name, type), this)},
+        function(err, data_) {
+            if (err) throw err;
+            data = data_;
+            packageParser.parsePackage(data, type, this);
+        },
+        function(err, pkg) {
+            if (err) throw err;
 
-        var pkg = packageParser.parseElisp(elisp);
-        if (!_.isEqual(pkg.version, version)) {
-            var err = new Error("Don't have " + name + ".el version " +
-                                version.join(".") + ", only version " +
-                                pkg.version.join(".") + "\n");
+            if (_.isEqual(pkg.version, version)) {
+                callback(null, data, pkg);
+                return;
+            }
+
+            err = new Error("Don't have " + name + ".el version " +
+                            version.join(".") + ", only version " +
+                            pkg.version.join(".") + "\n");
             err.name = "WrongVersionError";
-            callback(err, elisp);
-            return;
-        }
-
-        callback(null, elisp);
-    });
+            throw err;
+        });
 };
 
 exports.saveTarball = function(tar, callback) {
@@ -76,11 +80,8 @@ exports.getPackages = function(callback) {
             _(packages).each(function(pkg) {
                 var file = pkg[0],
                     data = pkg[1];
-                if (file.match(/\.el$/)) {
-                    pkgGroup()(null, packageParser.parseElisp(data.toString('utf8')));
-                } else {
-                    packageParser.parseTar(data, pkgGroup());
-                }
+                packageParser.parsePackage(
+                    data, file.match(/\.([a-z]+)$/)[1], pkgGroup());
             });
         },
         callback);

@@ -24,23 +24,27 @@ exports.create = function(middleware) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
     });
 
-    app.get(/^\/packages\/(.*)-([0-9.]+)\.el$/, function(req, res, params) {
+    app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, params) {
         var name = params.splat[0];
         var version = params.splat[1];
+        var type = params.splat[2];
         backend.loadPackage(
-            name, _.map(version.split("."), Number), function(err, elisp) {
+            name, _.map(version.split("."), Number), type, function(err, data, pkg) {
                 if (err) {
                     if (err.name === "WrongVersionError") {
                         res.send(err.message, {'Content-Type': 'text/plain'}, 404);
                     } else if (err.errno === process.ENOENT) {
-                        res.send("Don't have any version of " + name + ".el\n", 404);
+                        res.send("Don't have any version of " +
+                                 name + "." + type + "\n", 404);
                     } else {
                         throw err;
                     }
                     return;
                 }
 
-                res.send(elisp, {'Content-Type': 'text/plain'});
+                res.send(data, {'Content-Type': (pkg.type === 'el'
+                                                 ? 'text/plain'
+                                                 : 'application/x-tar')});
             });
     });
 

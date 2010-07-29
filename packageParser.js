@@ -158,3 +158,11 @@ exports.parseTar = function(tar, callback) {
         },
         callback);
 };
+
+exports.parsePackage = function(data, type, callback) {
+    if (type == "el") {
+        callback(null, exports.parseElisp(data.toString("utf8")));
+    } else {
+        exports.parseTar(data, callback);
+    }
+};
