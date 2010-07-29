@@ -10,17 +10,6 @@ function pkgFile(name, type) {
     return pkgDir + '/' + name + "." + type;
 };
 
-exports.savePackage = function(elisp, callback) {
-    var pkg = packageParser.parseElisp(elisp);
-    step(
-        function() {fs.open(pkgFile(pkg.name, 'el'), "w", 0600, this)},
-        function(err, fd) {
-            if (err) throw err;
-            fs.write(fd, elisp, null, "utf8", this)
-        },
-        function(err, written) {callback(err, pkg)});
-};
-
 exports.loadPackage = function(name, version, type, callback) {
     var data;
     step(
@@ -46,6 +35,13 @@ exports.loadPackage = function(name, version, type, callback) {
         });
 };
 
+exports.saveElisp = function(elisp, callback) {
+    var pkg = packageParser.parseElisp(elisp);
+    step(
+        function() {fs.writeFile(pkgFile(pkg.name, 'el'), "utf8", elisp, this)},
+        function(err) {callback(err, pkg)});
+};
+
 exports.saveTarball = function(tar, callback) {
     var pkg;
     step(
@@ -53,11 +49,9 @@ exports.saveTarball = function(tar, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            fs.writeFile(pkgDir + "/" + pkg.name + ".tar", tar, this);
+            fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
         },
-        function(err) {
-            callback(err, pkg);
-        })
+        function(err) {callback(err, pkg)});
 };
 
 exports.getPackages = function(callback) {
