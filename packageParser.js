@@ -33,7 +33,14 @@ function stripRCS(str) {
     return RegExp.$1;
 };
 
-function parseVersion(str) {
+function parseRequires(str) {
+    if (!str) return [];
+    return _(sexpParser.parse(str)).map(function(require) {
+        return [require[0], exports.parseVersion(require[1])];
+    });
+};
+
+exports.parseVersion = function(str) {
     return _(str.split(".")).map(Number);
 };
 
@@ -57,17 +64,32 @@ exports.parse = function(elisp) {
         throw 'Package does not have a "Version" or "Package-Version" header';
     var commentary = getSection(elisp, /commentary|documentation/);
 
-    if (requires) {
-        requires = _(sexpParser.parse(requires)).map(function(require) {
-            return [require[0], parseVersion(require[1])]
-        });
-    }
-    version = parseVersion(version);
+    requires = parseRequires(requires);
+    version = exports.parseVersion(version);
 
     return {
         name: filename,
         description: desc,
         commentary: commentary,
+        requires: requires,
+        version: version
+    };
+};
+
+exports.parseDeclaration = function(elisp) {
+    var sexp = sexpParser.parse(elisp);
+    if (!_.isArray(sexp) || !sexp[0] === "define-package") {
+        throw "Expected a call to define-package";
+    }
+
+    var name = sexp[1];
+    var version = exports.parseVersion(sexp[2]);
+    var desc = sexp[3];
+    var requires = parseRequires(sexp[4]);
+
+    return {
+        name: name,
+        description: desc,
         requires: requires,
         version: version
     };
