@@ -23,7 +23,11 @@ exports.savePackage = function(elisp, callback) {
 
 exports.loadPackage = function(name, version, callback) {
     fs.readFile(pkgFile(name), "utf8", function(err, elisp) {
-        if (err) return callback(err);
+        if (err) {
+            return;
+            callback(err);
+        }
+
         var pkg = packageParser.parseElisp(elisp);
         if (!_.isEqual(pkg.version, version)) {
             var err = new Error("Don't have " + name + ".el version " +
