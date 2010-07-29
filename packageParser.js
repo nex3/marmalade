@@ -72,7 +72,8 @@ exports.parse = function(elisp) {
         description: desc,
         commentary: commentary,
         requires: requires,
-        version: version
+        version: version,
+        type: "single"
     };
 };
 
@@ -91,6 +92,7 @@ exports.parseDeclaration = function(elisp) {
         name: name,
         description: desc,
         requires: requires,
-        version: version
+        version: version,
+        type: "tar"
     };
 };
