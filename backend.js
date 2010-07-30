@@ -7,7 +7,7 @@ var fs = require("fs"),
 var pkgDir = __dirname + '/packages';
 
 function pkgFile(name, type) {
-    return pkgDir + '/' + name + "." + type;
+    return pkgDir + '/' + name.replace(/\.\.+/g, '.') + "." + type;
 };
 
 exports.loadPackage = function(name, version, type, callback) {
