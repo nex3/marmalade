@@ -1,4 +1,7 @@
-var spawn = require("child_process").spawn;
+var spawn = require("child_process").spawn,
+    fs = require("fs"),
+    sys = require("sys"),
+    step = require("step");
 
 exports.run = function(command, args, input, callback) {
     if (callback === undefined) {

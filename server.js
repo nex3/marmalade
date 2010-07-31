@@ -1,7 +1,11 @@
-var connect = require("connect"),
+var Buffer = require("buffer").Buffer,
+    queryString = require("querystring"),
+    sys = require("sys"),
+    connect = require("connect"),
     express = require("express"),
     mustache = require("mustache"),
     step = require("step");
+    formidable = require("formidable"),
     backend = require("./backend"),
     helpers = require("./helpers");
 
@@ -45,6 +49,22 @@ exports.create = function(middleware) {
                 res.send(data, {'Content-Type': (pkg.type === 'el'
                                                  ? 'text/plain'
                                                  : 'application/x-tar')});
+            });
+    });
+
+    app.post('/packages', function(req, res) {
+        var form = new formidable.IncomingForm();
+        step(
+            function() {form.parse(req, this)},
+            function(err, fields, files) {
+                if (err) throw err;
+                backend.saveTarFile(files['package'].path, this);
+            },
+            function(err, pkg) {
+                if (err) throw err;
+                res.send("Saved " + pkg.name + ", version " +
+                         pkg.version.join(".") + "\n",
+                         {'Content-Type': 'text/plain'});
             });
     });
 

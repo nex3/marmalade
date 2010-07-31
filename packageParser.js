@@ -101,6 +101,18 @@ function parseDeclaration(elisp) {
 };
 
 exports.parseTar = function(tar, callback) {
+    parseTar_(function(tmpDir, cb) {
+        util.run("tar", ["--extract", "--directory", tmpDir], tar, cb);
+    }, callback);
+};
+
+exports.parseTarFile = function(file, callback) {
+    parseTar_(function(tmpDir, cb) {
+        util.run("tar", ["--extract", "--directory", tmpDir, "--file", file], cb);
+    }, callback);
+};
+
+function parseTar_(getTar, callback) {
     var tmpDir;
     var name;
     var version;
@@ -110,7 +122,7 @@ exports.parseTar = function(tar, callback) {
         function(err, output) {
             if (err) throw err;
             tmpDir = output.replace(/\n$/, "");
-            util.run("tar", ["--extract", "--directory", tmpDir], tar, this);
+            getTar(tmpDir, this);
         },
         function(err) {
             if (err) throw err;

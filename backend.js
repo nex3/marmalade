@@ -2,6 +2,7 @@ var fs = require("fs"),
     sys = require("sys"),
     step = require("step"),
     _ = require("underscore")._,
+    util = require("./util"),
     packageParser = require("./packageParser");
 
 var pkgDir = __dirname + '/packages';
@@ -35,10 +36,28 @@ exports.loadPackage = function(name, version, type, callback) {
         });
 };
 
+exports.savePackage = function(data, type, callback) {
+    if (type === 'el') exports.saveElisp(data.toString('utf8'), callback);
+    else if (type === 'tar') exports.saveTarball(data, callback);
+    else callback(new Error("Unknown filetype: " + type));
+};
+
 exports.saveElisp = function(elisp, callback) {
     var pkg = packageParser.parseElisp(elisp);
     step(
         function() {fs.writeFile(pkgFile(pkg.name, 'el'), "utf8", elisp, this)},
+        function(err) {callback(err, pkg)});
+};
+
+exports.saveTarFile = function(file, callback) {
+    var pkg;
+    step(
+        function() {packageParser.parseTarFile(file, this)},
+        function(err, pkg_) {
+            if (err) throw err;
+            pkg = pkg_;
+            util.run("mv", [file, pkgFile(pkg.name, 'tar')], this);
+        },
         function(err) {callback(err, pkg)});
 };
 
@@ -52,6 +71,17 @@ exports.saveTarball = function(tar, callback) {
             fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
         },
         function(err) {callback(err, pkg)});
+};
+
+function saveTar_() {
+    var pkg;
+    return step.fn(
+        function(err, pkg_) {
+            if (err) throw err;
+            pkg = pkg_;
+            fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
+        },
+        function(err) {this(err, pkg)});
 };
 
 exports.getPackages = function(callback) {
