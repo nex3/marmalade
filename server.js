@@ -58,7 +58,22 @@ exports.create = function(middleware) {
             function() {form.parse(req, this)},
             function(err, fields, files) {
                 if (err) throw err;
-                backend.saveTarFile(files['package'].path, this);
+                var ext = files['package'].filename.match(/\.([^.]+)$/);
+                if (!ext) {
+                    res.send("Couldn't determine file extension for " +
+                               files['package'].filename,
+                            400);
+                    return;
+                }
+                ext = ext[1];
+
+                if (ext === "tar") {
+                    backend.saveTarFile(files['package'].path, this);
+                } else if (ext === "el") {
+                    backend.saveElispFile(files['package'].path, this);
+                } else {
+                    res.send("Unkown file extension: " + ext, 400);
+                }
             },
             function(err, pkg) {
                 if (err) throw err;

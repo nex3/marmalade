@@ -42,10 +42,19 @@ exports.savePackage = function(data, type, callback) {
     else callback(new Error("Unknown filetype: " + type));
 };
 
+exports.saveElispFile = function(file, callback) {
+    step(
+        function() {fs.readFile(file, "utf8", this)},
+        function(err, elisp) {
+            if (err) throw err;
+            exports.saveElisp(elisp, callback);
+        });
+};
+
 exports.saveElisp = function(elisp, callback) {
     var pkg = packageParser.parseElisp(elisp);
     step(
-        function() {fs.writeFile(pkgFile(pkg.name, 'el'), "utf8", elisp, this)},
+        function() {fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this)},
         function(err) {callback(err, pkg)});
 };
 
