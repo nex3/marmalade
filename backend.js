@@ -32,7 +32,7 @@ exports.loadPackage = function(name, version, type, callback) {
                             version.join(".") + ", only version " +
                             pkg.version.join(".") + "\n");
             err.name = "WrongVersionError";
-            throw err;
+            callback(err);
         });
 };
 
