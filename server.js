@@ -36,7 +36,7 @@ exports.create = function(middleware) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
     });
 
-    app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res) {
+    app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, next) {
         var name = req.params[0];
         var version = req.params[1];
         var type = req.params[2];
@@ -49,7 +49,7 @@ exports.create = function(middleware) {
                         res.send("Don't have any version of " +
                                  name + "." + type + "\n", 404);
                     } else {
-                        throw err;
+                        next(err);
                     }
                     return;
                 }
@@ -60,7 +60,7 @@ exports.create = function(middleware) {
             });
     });
 
-    app.post('/packages', function(req, res) {
+    app.post('/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
         step(
             function() {form.parse(req, this)},
@@ -88,10 +88,10 @@ exports.create = function(middleware) {
                 res.send("Saved " + pkg.name + ", version " +
                          pkg.version.join(".") + "\n",
                          {'Content-Type': 'text/plain'});
-            });
+            }, next);
     });
 
-    app.get('/packages/archive-contents', function(req, res) {
+    app.get('/packages/archive-contents', function(req, res, next) {
         step(
             function() {backend.getPackages(this)},
             function(err, pkgs) {
@@ -104,7 +104,7 @@ exports.create = function(middleware) {
             function(err, str) {
                 if (err) throw err;
                 res.send(str, {'Content-Type': 'text/plain'});
-            });
+            }, next);
     });
 
     app.get('/packages/builtin-packages', function(req, res) {
