@@ -13,9 +13,9 @@ function pkgFile(name, type) {
 
 /**
  * Load the contents and metadata of a package from the backing store.
- * @param {String} name The name of the package to load.
- * @param {Array.<Number>} version The version of the package to load.
- * @param {String} type "el" for single-file elisp packages or "tar"
+ * @param {string} name The name of the package to load.
+ * @param {Array.<number>} version The version of the package to load.
+ * @param {string} type "el" for single-file elisp packages or "tar"
  *   for multi-file tar packages.
  * @param {Function.<Error, Buffer, Object>} callback
  *   Passed a buffer containing the package contents and a metadata object
