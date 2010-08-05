@@ -10,19 +10,27 @@ var Buffer = require("buffer").Buffer,
     helpers = require("./helpers");
 
 exports.create = function(middleware) {
-    var app = express.createServer(
-        connect.logger(),
-        connect.gzip(),
-        connect.errorHandler(),
-        connect.conditionalGet()
-    );
+    var app = express.createServer();
 
-    app.addListener('listening', function() {
-        var address = app.address();
-        var hostname = address.address;
-        if (hostname === "0.0.0.0") hostname = "localhost";
-        console.log("Jelly's spread all over " + hostname + ":" + address.port);
+
+    // Configuration
+
+    app.configure(function() {
+        app.use(connect.logger());
+        app.use(connect.gzip());
+        app.use(connect.conditionalGet());
     });
+
+    app.configure('development', function() {
+        app.use(connect.errorHandler({dumpExceptions: true, showStack: true}));
+    });
+
+    app.configure('production', function() {
+        app.use(connect.errorHandler());
+    });
+
+
+    // Routing
 
     app.get('/', function(req, res) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
@@ -101,6 +109,16 @@ exports.create = function(middleware) {
 
     app.get('/packages/builtin-packages', function(req, res) {
         res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
+    });
+
+
+    // User Friendliness
+
+    app.addListener('listening', function() {
+        var address = app.address();
+        var hostname = address.address;
+        if (hostname === "0.0.0.0") hostname = "localhost";
+        console.log("Jelly's spread all over " + hostname + ":" + address.port);
     });
 
     return app;
