@@ -36,7 +36,7 @@ exports.create = function(middleware) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
     });
 
-    app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, params) {
+    app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res) {
         var name = req.params[0];
         var version = req.params[1];
         var type = req.params[2];
