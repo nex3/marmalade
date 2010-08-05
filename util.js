@@ -1,7 +1,8 @@
 var spawn = require("child_process").spawn,
     fs = require("fs"),
     sys = require("sys"),
-    step = require("step");
+    step = require("step"),
+    _ = require("underscore")._;
 
 exports.run = function(command, args, input, callback) {
     if (callback === undefined) {
@@ -35,12 +36,23 @@ exports.run = function(command, args, input, callback) {
     if (input) child.stdin.end(input, 'utf8');
 };
 
-exports.errorClass = function(name) {
+exports.errorClass = function(nameOrFn) {
+    var name = nameOrFn;
+    var fn;
+    if (_.isFunction(nameOrFn)) {
+        name = nameOrFn.name;
+        fn = nameOrFn;
+    }
+
     var err = function(msg) {
         this.name = name;
         this.message = msg;
         Error.call(this, msg);
         Error.captureStackTrace(this, arguments.callee);
+
+        if (fn) {
+            fn.apply(this, Array.prototype.slice.call(arguments, 1));
+        }
     };
     sys.inherits(err, Error);
     return err;

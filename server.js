@@ -7,7 +7,12 @@ var Buffer = require("buffer").Buffer,
     step = require("step");
     formidable = require("formidable"),
     backend = require("./backend"),
-    helpers = require("./helpers");
+    helpers = require("./helpers"),
+    util = require("./util");
+
+var HttpError = util.errorClass(function HttpError(code) {
+    this.code = code;
+});
 
 exports.create = function(middleware) {
     var app = express.createServer();
@@ -66,6 +71,7 @@ exports.create = function(middleware) {
             function() {form.parse(req, this)},
             function(err, fields, files) {
                 if (err) throw err;
+
                 var ext = files['package'].filename.match(/\.([^.]+)$/);
                 if (!ext) {
                     res.send("Couldn't determine file extension for " +
@@ -80,11 +86,14 @@ exports.create = function(middleware) {
                 } else if (ext === "el") {
                     backend.saveElispFile(files['package'].path, this);
                 } else {
-                    res.send("Unkown file extension: " + ext, 400);
+                    throw new HttpError("Unkown file extension: " + ext, 400);
                 }
             },
             function(err, pkg) {
-                if (err) throw err;
+                if (err && err.name === 'SyntaxError') {
+                    throw new HttpError(err.message, 400);
+                } else if (err) throw err;
+
                 res.send("Saved " + pkg.name + ", version " +
                          pkg.version.join(".") + "\n",
                          {'Content-Type': 'text/plain'});
@@ -109,6 +118,16 @@ exports.create = function(middleware) {
 
     app.get('/packages/builtin-packages', function(req, res) {
         res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
+    });
+
+
+    // Error Handling
+
+    app.error(function(err, req, res, next) {
+        if (err instanceof HttpError) {
+            res.send(err.message + "\n", {'Content-Type': 'text/plain'},
+                     err.code);
+        } else next(err, req, res);
     });
 
 
