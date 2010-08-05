@@ -29,9 +29,9 @@ exports.create = function(middleware) {
     });
 
     app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, params) {
-        var name = params.splat[0];
-        var version = params.splat[1];
-        var type = params.splat[2];
+        var name = req.params[0];
+        var version = req.params[1];
+        var type = req.params[2];
         backend.loadPackage(
             name, _.map(version.split("."), Number), type, function(err, data, pkg) {
                 if (err) {
