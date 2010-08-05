@@ -26,14 +26,6 @@ exports.create = function(middleware) {
         app.use(connect.conditionalGet());
     });
 
-    app.configure('development', function() {
-        app.use(connect.errorHandler({dumpExceptions: true, showStack: true}));
-    });
-
-    app.configure('production', function() {
-        app.use(connect.errorHandler());
-    });
-
 
     // Routing
 
@@ -128,6 +120,14 @@ exports.create = function(middleware) {
             res.send(err.message + "\n", {'Content-Type': 'text/plain'},
                      err.code);
         } else next(err, req, res);
+    });
+
+    app.configure('development', function() {
+        app.use(connect.errorHandler({dumpExceptions: true, showStack: true}));
+    });
+
+    app.configure('production', function() {
+        app.use(connect.errorHandler());
     });
 
 
