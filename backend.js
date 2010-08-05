@@ -63,14 +63,18 @@ exports.saveElispFile = function(file, callback) {
               callback(err);
               return;
             }
-            exports.saveElisp(elisp, callback);
-        });
+            exports.saveElisp(elisp, this);
+        }, callback);
 };
 
 exports.saveElisp = function(elisp, callback) {
-    var pkg = packageParser.parseElisp(elisp);
+    var pkg;
     step(
-        function() {fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this)},
+        function() {pkg = packageParser.parseElisp(elisp)},
+        function(err) {
+            if (err) throw err;
+            fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this);
+        },
         function(err) {callback(err, pkg)});
 };
 
