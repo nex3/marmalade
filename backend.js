@@ -102,17 +102,6 @@ exports.saveTarball = function(tar, callback) {
         function(err) {callback(err, pkg)});
 };
 
-function saveTar_() {
-    var pkg;
-    return step.fn(
-        function(err, pkg_) {
-            if (err) throw err;
-            pkg = pkg_;
-            fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
-        },
-        function(err) {this(err, pkg)});
-};
-
 exports.getPackages = function(callback) {
     step(
         function() {fs.readdir('packages', this)},
