@@ -5,8 +5,19 @@ var fs = require("fs"),
     util = require("./util"),
     packageParser = require("./packageParser");
 
+/**
+ * The path to the directory where packages are stored.
+ * @type {string}
+ */
 var pkgDir = __dirname + '/packages';
 
+/**
+ * Returns the location of a package file on disk. Santizes the name so the
+ * location will always be beneath {@link pkgDir}.
+ * @param {string} name The name of the package.
+ * @param {string} type "el" for an Elisp package, "tar" for a tarball pacakge.
+ * @return {string} The path to the actual package file.
+ */
 function pkgFile(name, type) {
     return pkgDir + '/' + name.replace(/\.\.+/g, '.') + "." + type;
 };
@@ -49,12 +60,25 @@ exports.loadPackage = function(name, version, type, callback) {
         });
 };
 
+/**
+ * Save a package, either in Elisp or Tarball format, to the archive.
+ * @param {Buffer} data The contents of the package.
+ * @param {string} type "el" for single-file elisp packages or "tar"
+ *   for multi-file tar packages.
+ * @param {functiom(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.savePackage = function(data, type, callback) {
     if (type === 'el') exports.saveElisp(data.toString('utf8'), callback);
     else if (type === 'tar') exports.saveTarball(data, callback);
     else callback(new Error("Unknown filetype: " + type));
 };
 
+/**
+ * Save an Elisp package that currently resides in a file on disk to the
+ * archive.
+ * @param {string} file The name of the file where the Elisp code lives.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.saveElispFile = function(file, callback) {
     step(
         function() {fs.readFile(file, "utf8", this)},
@@ -67,6 +91,11 @@ exports.saveElispFile = function(file, callback) {
         }, callback);
 };
 
+/**
+ * Save an in-memory Elisp package to the archive.
+ * @param {string} elisp The Elisp package.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.saveElisp = function(elisp, callback) {
     var pkg;
     step(
@@ -78,6 +107,11 @@ exports.saveElisp = function(elisp, callback) {
         function(err) {callback(err, pkg)});
 };
 
+/**
+ * Save a tarred package that currently resides in a file on disk to the archive.
+ * @param {string} file The name of the tar file.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.saveTarFile = function(file, callback) {
     var pkg;
     step(
@@ -90,6 +124,12 @@ exports.saveTarFile = function(file, callback) {
         function(err) {callback(err, pkg)});
 };
 
+
+/**
+ * Save an in-memory tarred package to the archive.
+ * @param {Buffer} tar The tar data.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.saveTarball = function(tar, callback) {
     var pkg;
     step(
@@ -102,6 +142,12 @@ exports.saveTarball = function(tar, callback) {
         function(err) {callback(err, pkg)});
 };
 
+
+/**
+ * Get a list of the metadata for all packages in the archive.
+ * @param {function(Error=, Array.<Object>=)} callback Passed a list of all
+ *   package metadata.
+ */
 exports.getPackages = function(callback) {
     step(
         function() {fs.readdir('packages', this)},
