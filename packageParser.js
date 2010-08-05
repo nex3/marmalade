@@ -171,7 +171,11 @@ function parseTar_(getTar, callback) {
             }
 
             pkg.commentary = readme;
-            util.run("rm", ["-rf", tmpDir], function(){});
+            return pkg;
+        },
+        function(err, pkg) {
+            if (tmpDir) util.run("rm", ["-rf", tmpDir], function(){});
+            if (err) throw err;
             return pkg;
         },
         callback);
