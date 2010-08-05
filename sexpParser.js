@@ -22,7 +22,7 @@ Parser.prototype._tok = function(rx) {
 Parser.prototype._assert = function(rx) {
     var tok = this._tok(rx);
     if (tok) return tok;
-    throw "Syntax error: expected " + rx + ", was " + this._str;
+    throw new Error("Syntax error: expected " + rx + ", was " + this._str);
 };
 
 Parser.prototype._ws = function() {

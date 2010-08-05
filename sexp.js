@@ -55,6 +55,6 @@ exports.sexp = function(obj) {
     } else if (_.isNumber(obj)) {
         return exports.number(obj);
     } else {
-        throw "Cannot convert to sexp: " + sys.inspect(obj);
+        throw new Error("Cannot convert to sexp: " + sys.inspect(obj));
     }
 };

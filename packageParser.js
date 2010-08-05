@@ -25,7 +25,7 @@ function getSection(elisp, rx) {
 
     var endRx = new RegExp("^;{3," + level + "} .*:", "m");
     var endMatch = elisp.match(endRx);
-    if (!endMatch) throw "Unterminated section: " + startMatch[2];
+    if (!endMatch) throw new Error("Unterminated section: " + startMatch[2]);
 
     return startMatch[0] + elisp.substring(0, endMatch.index);
 };
@@ -50,14 +50,14 @@ function parseVersion(str) {
 
 exports.parseElisp = function(elisp) {
     var startMatch = elisp.match(/^;;; ([^ ]*)\.el --- (.*)$/m);
-    if (!startMatch) throw "No starting comment for package";
+    if (!startMatch) throw new Error("No starting comment for package");
 
     var filename = startMatch[1];
     var desc = startMatch[2];
 
     var endRx = new RegExp("^;;; " + escape(filename) + "\\.el ends here", "m");
     var endMatch = elisp.match(endRx);
-    if (!endMatch) throw "No closing comment for package";
+    if (!endMatch) throw new Error("No closing comment for package");
 
     elisp = elisp.substring(startMatch.index, endMatch.index + endMatch[0].length);
     var requires = getHeader(elisp, "package-requires");
@@ -83,7 +83,7 @@ exports.parseElisp = function(elisp) {
 function parseDeclaration(elisp) {
     var sexp = sexpParser.parse(elisp);
     if (!_.isArray(sexp) || !sexp[0] === "define-package") {
-        throw "Expected a call to define-package";
+        throw new Error("Expected a call to define-package");
     }
 
     var name = sexp[1];
@@ -133,8 +133,8 @@ function parseTar_(getTar, callback) {
             var match;
             if (files.length !== 1 ||
                 !(match = files[0].match(/^(.+)-([0-9.]+)$/))) {
-                throw "ELPA archives must contain exactly one directory," +
-                    "named <package>-<version>";
+                throw new Error("ELPA archives must contain exactly one " +
+                                "directory, named <package>-<version>");
             }
             name = match[1];
             version = parseVersion(match[2]);
@@ -156,12 +156,13 @@ function parseTar_(getTar, callback) {
             pkg = pkg_[0];
             readme = readme[0];
             if (!_.isEqual(pkg.name, name)) {
-                throw "Package name \"" + pkg.name + "\" in " + name + "-pkg.el" +
-                    " doesn't match archive name \"" + name + "\"!";
+                throw new Error("Package name \"" + pkg.name + "\" in " +
+                                name + "-pkg.el" + " doesn't match archive " +
+                                "name \"" + name + "\"!");
             } else if (!_.isEqual(pkg.version, version)) {
-                throw "Package version \"" + pkg.version.join(".") + "\" in " +
-                    name + "-pkg.el doesn't match archive version \"" +
-                    version.join(".") + "\"!";
+                throw new Error("Package version \"" + pkg.version.join(".") +
+                                "\" in " + name + "-pkg.el doesn't match archive " +
+                                "version \"" + version.join(".") + "\"!");
             }
 
             pkg.commentary = readme;
