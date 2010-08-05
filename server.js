@@ -33,6 +33,8 @@ exports.create = function(middleware) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
     });
 
+    /// ELPA Interface
+
     app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, next) {
         var name = req.params[0];
         var version = req.params[1];
@@ -56,6 +58,28 @@ exports.create = function(middleware) {
                                                  : 'application/x-tar')});
             });
     });
+
+    app.get('/packages/archive-contents', function(req, res, next) {
+        step(
+            function() {backend.getPackages(this)},
+            function(err, pkgs) {
+                if (err) throw err;
+                res.render("archive-contents.ejs", {
+                    locals: helpers.extend({packages: pkgs}),
+                    layout: false
+                }, this);
+            },
+            function(err, str) {
+                if (err) throw err;
+                res.send(str, {'Content-Type': 'text/plain'});
+            }, next);
+    });
+
+    app.get('/packages/builtin-packages', function(req, res) {
+        res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
+    });
+
+    /// Jelly Interface
 
     app.post('/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
@@ -90,26 +114,6 @@ exports.create = function(middleware) {
                          pkg.version.join(".") + "\n",
                          {'Content-Type': 'text/plain'});
             }, next);
-    });
-
-    app.get('/packages/archive-contents', function(req, res, next) {
-        step(
-            function() {backend.getPackages(this)},
-            function(err, pkgs) {
-                if (err) throw err;
-                res.render("archive-contents.ejs", {
-                    locals: helpers.extend({packages: pkgs}),
-                    layout: false
-                }, this);
-            },
-            function(err, str) {
-                if (err) throw err;
-                res.send(str, {'Content-Type': 'text/plain'});
-            }, next);
-    });
-
-    app.get('/packages/builtin-packages', function(req, res) {
-        res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
     });
 
 
