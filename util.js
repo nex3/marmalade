@@ -34,3 +34,14 @@ exports.run = function(command, args, input, callback) {
 
     if (input) child.stdin.end(input, 'utf8');
 };
+
+exports.errorClass = function(name) {
+    var err = function(msg) {
+        this.name = name;
+        this.message = msg;
+        Error.call(this, msg);
+        Error.captureStackTrace(this, arguments.callee);
+    };
+    sys.inherits(err, Error);
+    return err;
+};
