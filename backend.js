@@ -31,7 +31,10 @@ exports.loadPackage = function(name, version, type, callback) {
             packageParser.parsePackage(data, type, this);
         },
         function(err, pkg) {
-            if (err) throw err;
+            if (err) {
+              callback(err);
+              return;
+            }
 
             if (_.isEqual(pkg.version, version)) {
                 callback(null, data, pkg);
@@ -56,7 +59,10 @@ exports.saveElispFile = function(file, callback) {
     step(
         function() {fs.readFile(file, "utf8", this)},
         function(err, elisp) {
-            if (err) throw err;
+            if (err) {
+              callback(err);
+              return;
+            }
             exports.saveElisp(elisp, callback);
         });
 };
