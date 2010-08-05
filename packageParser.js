@@ -64,7 +64,8 @@ exports.parseElisp = function(elisp) {
     var version = stripRCS(getHeader(elisp, "package-version") ||
                            getHeader(elisp, "version"));
     if (!version)
-        throw 'Package does not have a "Version" or "Package-Version" header';
+        throw new Error('Package does not have a "Version" or ' +
+                        '"Package-Version" header');
     var commentary = getSection(elisp, /commentary|documentation/);
 
     requires = parseRequires(requires);
