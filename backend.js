@@ -17,7 +17,7 @@ function pkgFile(name, type) {
  * @param {Array.<number>} version The version of the package to load.
  * @param {string} type "el" for single-file elisp packages or "tar"
  *   for multi-file tar packages.
- * @param {Function.<Error, Buffer, Object>} callback
+ * @param {function(Error=, Buffer=, Object=)} callback
  *   Passed a buffer containing the package contents and a metadata object
  *   of the sort returned by packageParser.parse*.
  */
