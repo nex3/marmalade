@@ -39,9 +39,19 @@ function stripRCS(str) {
     return RegExp.$1;
 };
 
+function parseSexp(str) {
+    try {
+        sexpParser.parse(str);
+    } catch (err) {
+        if (err instanceof sexpParser.SyntaxError) {
+            throw new SyntaxError(err.message);
+        } else throw err;
+    }
+};
+
 function parseRequires(str) {
     if (!str) return [];
-    return _(sexpParser.parse(str)).map(function(require) {
+    return _(parseSexp(str)).map(function(require) {
         return [require[0], parseVersion(require[1])];
     });
 };
@@ -85,7 +95,7 @@ exports.parseElisp = function(elisp) {
 };
 
 function parseDeclaration(elisp) {
-    var sexp = sexpParser.parse(elisp);
+    var sexp = parseSexp(elisp);
     if (!_.isArray(sexp) || !sexp[0] === "define-package") {
         throw new SyntaxError("Expected a call to define-package");
     }
