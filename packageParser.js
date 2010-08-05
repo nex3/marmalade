@@ -1,4 +1,5 @@
 var fs = require("fs"),
+    sys = require("sys"),
     _ = require("underscore")._,
     step = require("step"),
     util = require("./util");
@@ -39,9 +40,14 @@ function stripRCS(str) {
     return RegExp.$1;
 };
 
-function parseSexp(str) {
+function parseSexp(str, type) {
     try {
-        sexpParser.parse(str);
+        var sexp = sexpParser.parse(str);
+        if (!(sexp instanceof type)) {
+            throw new SyntaxError("Expected " + sys.inspect(sexp) + " to be of " +
+                                  "type " + type);
+        }
+        return sexp;
     } catch (err) {
         if (err instanceof sexpParser.SyntaxError) {
             throw new SyntaxError(err.message);
@@ -51,7 +57,7 @@ function parseSexp(str) {
 
 function parseRequires(str) {
     if (!str) return [];
-    return _(parseSexp(str)).map(function(require) {
+    return _(parseSexp(str, Array)).map(function(require) {
         return [require[0], parseVersion(require[1])];
     });
 };
@@ -95,8 +101,8 @@ exports.parseElisp = function(elisp) {
 };
 
 function parseDeclaration(elisp) {
-    var sexp = parseSexp(elisp);
-    if (!_.isArray(sexp) || !sexp[0] === "define-package") {
+    var sexp = parseSexp(elisp, Array);
+    if (!sexp[0] === "define-package") {
         throw new SyntaxError("Expected a call to define-package");
     }
 
