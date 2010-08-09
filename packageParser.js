@@ -5,20 +5,46 @@ var fs = require("fs"),
     util = require("./util");
     sexpParser = require("./sexpParser");
 
+/**
+ * An error class raised when parsing packages fails.
+ * @param {string} msg The error message.
+ * @constructor
+ */
 var SyntaxError = exports.SyntaxError = util.errorClass('SyntaxError');
 
+/**
+ * Regexp-escapes a string.
+ * @param {string} str
+ * @return {string}
+ */
 function escape(str) {
     return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
 
-var headerPrefix = "^;+[ \t]+(?:@\\(#\\))?[ \t]*\\$?";
-
+/**
+ * Gets the value of a header declaration (e.g. ";; Version: 1.0") in an Elisp
+ * package.
+ * @param {string} elisp The package code.
+ * @param {string} header The name of the header.
+ * @return {string} The value of the header.
+ */
 function getHeader(elisp, header) {
-    var rx = new RegExp(headerPrefix + escape(header) + "[ \t]*:[ \t]*(.*)", "im");
+    var rx = new RegExp("^;+[ \t]+(?:@\\(#\\))?[ \t]*\\$?" + escape(header) +
+                        "[ \t]*:[ \t]*(.*)", "im");
     var match = elisp.match(rx);
     return match && match[1];
 };
 
+/**
+ * Gets the contents of an entire header section. This means everything from
+ * (and including) the opening ";;; Section Name" to (and excluding) the next
+ * section header that's as or more deep than this section.
+ * @param {string} elisp The package code.
+ * @param {RegExp} rx The regular expression for matching the header.
+ *   Automatically made case-insensitive.
+ * @return {string} The entire section contents, including leading comment
+ *   markers.
+ */
 function getSection(elisp, rx) {
     startRx = new RegExp("^(;{3};*) (" + rx.source + ")[ \t]*:", "im");
     var startMatch = elisp.match(startRx);
@@ -34,12 +60,25 @@ function getSection(elisp, rx) {
     return startMatch[0] + elisp.substring(0, endMatch.index);
 };
 
+/**
+ * Get rid of the "$Revision: 1234$" annotation for a version string.
+ * @param {string} str The version string.
+ * @return {string} The version string without the Revision annotation.
+ */
 function stripRCS(str) {
     if (!str) return str;
     if (!str.match(/^[ \t]*\$Revision:[ \t]([0-9.]+)[ \t]*\$$/)) return str;
     return RegExp.$1;
 };
 
+/**
+ * Like sexpParser.parse, but does typechecking and wraps any SyntaxErrors in
+ * our own SyntaxError class.
+ * @param {string} str The Elisp code to parse.
+ * @param {function} type The expected type of the s-expression. Should be
+ *   usable as the right-hand side of instanceof.
+ * @return {*} The s-expression value.
+ */
 function parseSexp(str, type) {
     try {
         var sexp = sexpParser.parse(str);
@@ -55,6 +94,13 @@ function parseSexp(str, type) {
     }
 };
 
+/**
+ * Parse the value of the Package-Requires header. The header is a list of
+ * name/version pairs; this returns an array of name/version pairs.
+ * @param {string} str The Elisp code to parse.
+ * @return {Array.<[string, Array.<number>]>} A list of
+ *   package-name/version-number pairs that this package depends on.
+ */
 function parseRequires(str) {
     if (!str) return [];
     return _(parseSexp(str, Array)).map(function(require) {
@@ -62,11 +108,21 @@ function parseRequires(str) {
     });
 };
 
+/**
+ * Parse a version number string.
+ * @param {string} str The period-separated version number.
+ * @return {Array.<number>} The parsed version number.
+ */
 function parseVersion(str) {
     return _(str.split(".")).map(Number);
 };
 
 
+/**
+ * Parse an Elisp package and return its metadata.
+ * @param {string} elisp The contents of an Elisp pacakge.
+ * @return {Object} The package's metadata.
+ */
 exports.parseElisp = function(elisp) {
     var startMatch = elisp.match(/^;;; ([^ ]*)\.el --- (.*)$/m);
     if (!startMatch) throw new SyntaxError("No starting comment for package");
@@ -100,6 +156,13 @@ exports.parseElisp = function(elisp) {
     };
 };
 
+/**
+ * Parse a call to (define-package). This obviously doesn't actually run any
+ * expressions, so it will only work with static parameters. I think the same is
+ * true for package.el, though.
+ * @param {string} elisp The Emacs lisp containing the call to (define-package).
+ * @return {Object} The package metadata.
+ */
 function parseDeclaration(elisp) {
     var sexp = parseSexp(elisp, Array);
     if (!sexp[0] === "define-package") {
@@ -120,18 +183,35 @@ function parseDeclaration(elisp) {
     };
 };
 
+/**
+ * Parse a tarred package and return its metadata.
+ * @param {Buffer} tar The tarball data.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.parseTar = function(tar, callback) {
     parseTar_(function(tmpDir, cb) {
         util.run("tar", ["--extract", "--directory", tmpDir], tar, cb);
     }, callback);
 };
 
+/**
+ * Parse a tarred package stored on disk and return its metadata.
+ * @param {string} file The filename of the tarball.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.parseTarFile = function(file, callback) {
     parseTar_(function(tmpDir, cb) {
         util.run("tar", ["--extract", "--directory", tmpDir, "--file", file], cb);
     }, callback);
 };
 
+/**
+ * Helper function for tarball parsing.
+ * @param {function(string, function(Error=, Object=))} getTar A function that
+ *   runs the tar process to extract the package to a directory. Passed the
+ *   directory to which to extract the package, and a callback.
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 function parseTar_(getTar, callback) {
     var tmpDir;
     var name;
@@ -197,6 +277,12 @@ function parseTar_(getTar, callback) {
         callback);
 };
 
+/**
+ * Parse a package of either type from a data buffer.
+ * @param {Buffer} data The buffer containing the package data.
+ * @param {string} type Either "el" or "tar".
+ * @param {function(Error=, Object=)} callback Passed the package metadata.
+ */
 exports.parsePackage = function(data, type, callback) {
     if (type == "el") {
         callback(null, exports.parseElisp(data.toString("utf8")));
