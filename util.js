@@ -1,3 +1,8 @@
+/**
+ * This file just contains several useful functions that don't fit anywhere
+ * else.
+ */
+
 var spawn = require("child_process").spawn,
     fs = require("fs"),
     sys = require("sys"),

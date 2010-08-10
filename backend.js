@@ -1,3 +1,12 @@
+/**
+ * This file handles persisting the package data and metadata, as well as
+ * extracting the metadata from the data.
+ *
+ * Currently the archive is just backed by the filesystem. This means that in
+ * order to generate the list of package metadata, we have to parse each package
+ * individually. This is obviously suboptimal and will change shortly.
+ */
+
 var fs = require("fs"),
     sys = require("sys"),
     step = require("step"),

@@ -1,3 +1,8 @@
+/**
+ * This file handles converting JS objects into Elisp objects. This is necessary
+ * for places where ELPA gives an sexp-valued response.
+ */
+
 var sys = require("sys"),
     _ = require("underscore")._;
 

@@ -1,3 +1,11 @@
+/**
+ * The actual faux-ELPA server. The main job of this file is to hook up the
+ * backend to an HTTP interface. This interface is a superset of ELPA's, and so
+ * can be used as a package.el source. So far, the only extensions have to do
+ * with presenting a web frontend (basically nonexistent at time of writing) and
+ * providing facilities for user-uploaded packages.
+ */
+
 var Buffer = require("buffer").Buffer,
     queryString = require("querystring"),
     sys = require("sys"),

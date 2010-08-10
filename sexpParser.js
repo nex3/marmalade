@@ -1,4 +1,10 @@
 /**
+ * This file parses Elisp. Unlike packageParser.js, this is an actual parser,
+ * rather than being heuristic-based. However, it's limited to parsing only the
+ * subset of Elisp that we actually receive from Emacs.
+ */
+
+/**
  * An error class raised when parsing elisp fails.
  * @param {string} msg The error message.
  * @constructor

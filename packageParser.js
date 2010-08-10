@@ -1,3 +1,11 @@
+/**
+ * This file actually parses the package files to extract the metadata. It does
+ * so in several ways of various levels of hackiness. For Elisp files, it does
+ * some simple regexp parsing to find and parse the headers. For tarballs, it
+ * opens them up and reads their *-pkg.el file, parsing the call to
+ * `(define-package)` in order to get at the metadata.
+ */
+
 var fs = require("fs"),
     sys = require("sys"),
     _ = require("underscore")._,
