@@ -13,7 +13,7 @@ var pkgDir = __dirname + '/packages';
 
 /**
  * Returns the location of a package file on disk. Santizes the name so the
- * location will always be beneath {@link pkgDir}.
+ * location will always be beneath `pkgDir`.
  * @param {string} name The name of the package.
  * @param {string} type "el" for an Elisp package, "tar" for a tarball pacakge.
  * @return {string} The path to the actual package file.

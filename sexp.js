@@ -32,7 +32,7 @@ exports.keyword = function(str) {
  * Converts a JS array to a space-separated string of Elisp representations of
  * its values. This string can be used as the inside of a list or vector.
  * 
- * Values are converted via {@link sexp}.
+ * Values are converted via `sexp`.
  * @param {Array} arr
  * @return {string}
  */
@@ -41,7 +41,7 @@ function listLike(arr) {
 };
 
 /**
- * Converts a JS array to an Elisp list. Values are converted via {@link sexp}.
+ * Converts a JS array to an Elisp list. Values are converted via `sexp`.
  * @param {Array} arr
  * @return {string}
  */
@@ -50,7 +50,7 @@ exports.list = function(arr) {
 };
 
 /**
- * Converts a JS array to an Elisp vector. Values are converted via {@link sexp}.
+ * Converts a JS array to an Elisp vector. Values are converted via `sexp`.
  * @param {Array} arr
  * @return {string}
  */
