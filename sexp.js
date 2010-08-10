@@ -105,6 +105,7 @@ exports.sexp = function(obj) {
         case 'list': return exports.list(obj);
         case 'vector': return exports.vector(obj);
         } 
+        throw new Error("Unrecognized lispType: " + sys.inspect(obj.lispType));
     } else if (_.isString(obj)) {
         return exports.string(obj);
     } else if (_.isArray(obj))  {
