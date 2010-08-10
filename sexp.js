@@ -89,7 +89,7 @@ exports.number = function(num) {
  * as a string.
  *
  * @param {null|undefined|string|boolean|number|Array} obj The JS object to
- * convert to a sexp.
+ *   convert to a sexp.
  * @return {string}
  */
 exports.sexp = function(obj) {
