@@ -156,7 +156,10 @@ exports.saveElispFile = function(file, callback) {
 exports.saveElisp = function(elisp, callback) {
     var pkg;
     step(
-        function() {pkg = packageParser.parseElisp(elisp)},
+        function() {
+            pkg = packageParser.parseElisp(elisp);
+            return null;
+        },
         function(err) {
             if (err) throw err;
             fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this);
