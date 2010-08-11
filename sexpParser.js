@@ -3,6 +3,7 @@
  * rather than being heuristic-based. However, it's limited to parsing only the
  * subset of Elisp that we actually receive from Emacs.
  */
+var util = require("./util");
 
 /**
  * An error class raised when parsing elisp fails.
