@@ -5,6 +5,32 @@
  * Currently the archive is just backed by the filesystem. This means that in
  * order to generate the list of package metadata, we have to parse each package
  * individually. This is obviously suboptimal and will change shortly.
+ *
+ * The "package metadata" referenced here and elsewhere is an object with the
+ * following fields:
+ *
+ *   * *name*: The string name of the package.
+ *   * *description*: A single-line description of the package, taken from the
+ *         header line for Elisp packages.
+ *   * *commentary*: An optional longer description of the package, taken from
+ *         the Commentary section for Elisp packages and the README file for
+ *         tarballs.
+ *   * *requires*: An array of name/version pairs describing the dependencies of
+ *         the package. The format for the versions is the same as the *version*
+ *         field.
+ *   * *version*: An array of numbers representing the dot-separated version.
+ *   * *type*: Either "single" (for an Elisp file) or "tar" (for a tarball).
+ *
+ * For example, the metadata for `sass-mode` version 3.0.13 might look like:
+ *
+ *     {
+ *       name: "sass-mode",
+ *       description: "Major mode for editing Sass files",
+ *       commentary: "Blah blah blah",
+ *       requires: [["haml-mode", [3, 0, 13]]],
+ *       version: [3, 0, 13],
+ *       type: "single"
+ *     }
  */
 
 var fs = require("fs"),
