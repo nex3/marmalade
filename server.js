@@ -18,15 +18,34 @@ var Buffer = require("buffer").Buffer,
     helpers = require("./helpers"),
     util = require("./util");
 
+/**
+ * An error class raised when we want to send back a specific HTTP error code.
+ * This is caught by the server and used to send back the appropriate response.
+ * This can be useful to throw within a `step` sequence, since throwing is the
+ * only way to do a somewhate-nonlocal exit.
+ * @param {string} msg The error message.
+ * @param {number} code The error code.
+ */
 var HttpError = util.errorClass(function HttpError(code) {
     this.code = code;
 });
 
-exports.create = function(middleware) {
+/**
+ * Create a Jelly server. This is a standard Express application, with routes
+ * and configuration set up for Jelly. To start it, just call
+ * `.create().listen()`.
+ * @return {express.Server}
+ */
+exports.create = function() {
     var app = express.createServer();
 
 
-    // Configuration
+    /** ## Configuration
+     *
+     * Logging is handy and gzipping is nice. I don't think `conditionalGet`
+     * works without some effort on the server's part, so it's here as a
+     * reminder to do that at some point.
+     */
 
     app.configure(function() {
         app.use(connect.logger());
@@ -35,14 +54,29 @@ exports.create = function(middleware) {
     });
 
 
-    // Routing
+    /** # Routing */
 
+    /** ## Web Frontend
+     *
+     * Eventually, this will be more fleshed out than it is right now.
+     */
+
+    /**
+     * The main page. Very bare at the moment.
+     */
     app.get('/', function(req, res) {
         res.send("<h1>Jelly - Elisp Packages on Toast</h1>");
     });
 
-    /// ELPA Interface
+    /** ## ELPA Interface
+     *
+     * These routes are the API exposed by ELPA and expected by package.js. ELPA
+     * proper makes everything static files, but we're more dynamic about it.
+     */
 
+    /**
+     * Download an individual package at a specific version.
+     */
     app.get(/^\/packages\/(.*)-([0-9.]+)\.(el|tar)$/, function(req, res, next) {
         var name = req.params[0];
         var version = req.params[1];
@@ -67,6 +101,10 @@ exports.create = function(middleware) {
             });
     });
 
+    /**
+     * Gets the list of all packages available. This is sent as an Elisp sexp
+     * representation of the package metadata.
+     */
     app.get('/packages/archive-contents', function(req, res, next) {
         step(
             function() {backend.getPackages(this)},
@@ -83,12 +121,25 @@ exports.create = function(middleware) {
             }, next);
     });
 
+    /**
+     * Gets a list of builtin packages. We don't want to keep track of this, so
+     * we redirect to the official ELPA list.
+     */
     app.get('/packages/builtin-packages', function(req, res) {
         res.redirect("http://elpa.gnu.org/packages/builtin-packages", 301);
     });
 
-    /// Jelly Interface
+    /** ## Jelly Interface
+     *
+     * These routes are the API we expose in addition to that required by ELPA.
+     * So far this just has to do with uploading packages.
+     */
 
+    /**
+     * Uploads a package. This takes a multipart form post with a single Elisp
+     * or tar file labeled `package`. The type of the package is inferred from
+     * its filename.
+     */
     app.post('/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
         step(
@@ -125,8 +176,11 @@ exports.create = function(middleware) {
     });
 
 
-    // Error Handling
+    /** ## Error Handling */
 
+    /**
+     * HttpErrors mean that we should send back a specific response code.
+     */
     app.error(function(err, req, res, next) {
         if (err instanceof HttpError) {
             res.send(err.message + "\n", {'Content-Type': 'text/plain'},
@@ -134,6 +188,9 @@ exports.create = function(middleware) {
         } else next(err, req, res);
     });
 
+    /**
+     * Handle other errors using the standard error handler.
+     */
     app.configure('development', function() {
         app.use(connect.errorHandler({dumpExceptions: true, showStack: true}));
     });
@@ -143,7 +200,11 @@ exports.create = function(middleware) {
     });
 
 
-    // User Friendliness
+    /** ## User Friendliness
+     *
+     * It's nice to say something when the server starts so the user knows
+     * what's what.
+     */
 
     app.addListener('listening', function() {
         var address = app.address();
