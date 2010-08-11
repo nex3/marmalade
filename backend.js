@@ -162,6 +162,10 @@ exports.saveElisp = function(elisp, callback) {
         },
         function(err) {
             if (err) throw err;
+            store.save(pkg.name, pkg, this);
+        },
+        function(err) {
+            if (err) throw err;
             fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this);
         },
         function(err) {callback(err, pkg)});
@@ -179,6 +183,10 @@ exports.saveTarFile = function(file, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
+            store.save(pkg.name, pkg, this);
+        },
+        function(err) {
+            if (err) throw err;
             util.run("mv", [file, pkgFile(pkg.name, 'tar')], this);
         },
         function(err) {callback(err, pkg)});
@@ -197,6 +205,10 @@ exports.saveTarball = function(tar, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
+            store.save(pkg.name, pkg, this);
+        },
+        function(err) {
+            if (err) throw err;
             fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
         },
         function(err) {callback(err, pkg)});
