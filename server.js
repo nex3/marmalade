@@ -200,13 +200,14 @@ exports.create = function() {
     });
 
 
-    /** ## User Friendliness
+    /** ## Initialization
      *
-     * It's nice to say something when the server starts so the user knows
-     * what's what.
+     * Load the database before we start accepting incoming connections.
      */
 
     app.addListener('listening', function() {
+        console.log("Loading database...")
+        backend.init();
         var address = app.address();
         var hostname = address.address;
         if (hostname === "0.0.0.0") hostname = "localhost";

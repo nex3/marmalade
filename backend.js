@@ -37,6 +37,7 @@ var fs = require("fs"),
     sys = require("sys"),
     step = require("step"),
     _ = require("underscore")._,
+    nStore = require("nStore"),
     util = require("./util"),
     packageParser = require("./packageParser");
 
@@ -47,6 +48,18 @@ var fs = require("fs"),
 var pkgDir = __dirname + '/packages';
 
 /**
+ * The path to the database containing the package metadata.
+ * @type {string}
+ */
+var dbFile = __dirname + '/jelly.db';
+
+/**
+ * The nStore database containing the package metadata.
+ * @type {nStore.store}
+ */
+var store;
+
+/**
  * Returns the location of a package file on disk. Santizes the name so the
  * location will always be beneath `pkgDir`.
  * @param {string} name The name of the package.
@@ -55,6 +68,15 @@ var pkgDir = __dirname + '/packages';
  */
 function pkgFile(name, type) {
     return pkgDir + '/' + name.replace(/\.\.+/g, '.') + "." + type;
+};
+
+/**
+ * Initialize the backend. This must be called before any other backend
+ * functions. Note that this function may actually block for a nontrivial amount
+ * of time.
+ */
+exports.init = function() {
+    store = nStore(dbFile);
 };
 
 /**
