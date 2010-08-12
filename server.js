@@ -59,6 +59,7 @@ exports.create = function(dataDir, callback) {
         app.use(connect.logger());
         app.use(connect.gzip());
         app.use(connect.conditionalGet());
+        app.use(connect.bodyDecoder());
     });
 
 
@@ -192,6 +193,25 @@ exports.create = function(dataDir, callback) {
 
                 res.send("Saved " + pkg.name + ", version " +
                          pkg.version.join(".") + "\n",
+                         {'Content-Type': 'text/plain'});
+            }, next);
+    });
+
+    /**
+     * Registers a new user. This should have "name" and "password" parameters.
+     */
+    app.post('/users', function(req, res, next) {
+        step(
+            function() {
+                app.backend.registerUser(req.param('name'),
+                                         req.param('password'),
+                                         this);
+            },
+            function(err, user) {
+                if (err instanceof backend.RegistrationError) {
+                    throw new HttpError(err.message, 400);
+                } else if (err) throw err;
+                res.send("Successfully registered " + user.name + "\n",
                          {'Content-Type': 'text/plain'});
             }, next);
     });
