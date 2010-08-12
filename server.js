@@ -34,10 +34,17 @@ var HttpError = util.errorClass(function HttpError(code) {
  * Create a Jelly server. This is a standard Express application, with routes
  * and configuration set up for Jelly. To start it, just call
  * `.create().listen()`.
+ * @param {string} dataDir The root of the Jelly backend's data store.
  * @return {express.Server}
  */
-exports.create = function() {
+exports.create = function(dataDir) {
     var app = express.createServer();
+
+    /**
+     * The Jelly backend. This is null until until the server starts listening.
+     * @type {?backend.Backend}
+     */
+    app.backend = null;
 
 
     /** ## Configuration
@@ -81,7 +88,7 @@ exports.create = function() {
         var name = req.params[0];
         var version = req.params[1];
         var type = req.params[2];
-        backend.loadPackage(
+        app.backend.loadPackage(
             name, _.map(version.split("."), Number), type, function(err, data, pkg) {
                 if (err) {
                     if (err instanceof backend.LoadError) {
@@ -109,7 +116,7 @@ exports.create = function() {
      */
     app.get('/packages/archive-contents', function(req, res, next) {
         step(
-            function() {backend.getPackages(this)},
+            function() {app.backend.getPackages(this)},
             function(err, pkgs) {
                 if (err) throw err;
                 res.render("archive-contents.ejs", {
@@ -159,9 +166,9 @@ exports.create = function() {
                 ext = ext[1];
 
                 if (ext === "tar") {
-                    backend.saveTarFile(files['package'].path, this);
+                    app.backend.saveTarFile(files['package'].path, this);
                 } else if (ext === "el") {
-                    backend.saveElispFile(files['package'].path, this);
+                    app.backend.saveElispFile(files['package'].path, this);
                 } else {
                     throw new HttpError("Unkown file extension: " + ext, 400);
                 }
@@ -209,7 +216,7 @@ exports.create = function() {
 
     app.addListener('listening', function() {
         console.log("Loading database...")
-        backend.init();
+        app.backend = backend.create(dataDir);
         var address = app.address();
         var hostname = address.address;
         if (hostname === "0.0.0.0") hostname = "localhost";

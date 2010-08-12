@@ -42,33 +42,10 @@ var fs = require("fs"),
     packageParser = require("./packageParser");
 
 /**
- * The path to the directory where packages are stored.
- * @type {string}
- */
-var pkgDir = __dirname + '/packages';
-
-/**
- * The path to the database containing the package metadata.
- * @type {string}
- */
-var dbFile = __dirname + '/jelly.db';
-
-/**
  * The nStore database containing the package metadata.
  * @type {nStore.store}
  */
 var store;
-
-/**
- * Returns the location of a package file on disk. Santizes the name so the
- * location will always be beneath `pkgDir`.
- * @param {string} name The name of the package.
- * @param {string} type "el" for an Elisp package, "tar" for a tarball pacakge.
- * @return {string} The path to the actual package file.
- */
-function pkgFile(name, type) {
-    return pkgDir + '/' + name.replace(/\.\.+/g, '.') + "." + type;
-};
 
 /**
  * An error class raised when the backend fails to load a given package. Note
@@ -78,12 +55,40 @@ function pkgFile(name, type) {
 exports.LoadError = util.errorClass('LoadError');
 
 /**
- * Initialize the backend. This must be called before any other backend
- * functions. Note that this function may actually block for a nontrivial amount
- * of time.
+ * Initialize a Jelly backend. Note that this function may actually block for a
+ * nontrivial amount of time.
+ *k
+ * @param {string} dataDir The root of the backend's data store. This is used
+ *   for storing various different sorts of data.
+ * @return {Backend}
  */
-exports.init = function() {
-    store = nStore(dbFile);
+exports.create = function(dataDir) {
+    return new Backend(dataDir);
+};
+
+/**
+ * A class representing a Jelly backend. This constructor may actually block for
+ * a nontrivial amount of time.
+ *
+ * @param {string} dataDir The root of the backend's data store. This is used
+ *   for storing various different sorts of data.
+ * @constructor
+ */
+var Backend = function(dataDir) {
+    this.dataDir_ = dataDir;
+    this.store_ = nStore(dataDir + "/packages.db");
+};
+
+/**
+ * Returns the location of a package file on disk. Santizes the name so the
+ * location will always be in the proper directory.
+ * @param {string} name The name of the package.
+ * @param {string} type "el" for an Elisp package, "tar" for a tarball pacakge.
+ * @return {string} The path to the actual package file.
+ */
+Backend.prototype.pkgFile_ = function(name, type) {
+    return this.dataDir_ + '/packages/' + name.replace(/\.\.+/g, '.') +
+        "." + type;
 };
 
 /**
@@ -96,12 +101,13 @@ exports.init = function() {
  *   Passed a buffer containing the package contents and a metadata object
  *   of the sort returned by packageParser.parse*.
  */
-exports.loadPackage = function(name, version, type, callback) {
+Backend.prototype.loadPackage = function(name, version, type, callback) {
+    var self = this;
     var pkg;
     step(
-        function() {store.get(name, this)},
+        function() {self.store_.get(name, this)},
         function(err, pkg_) {
-            if (!pkg) {
+            if (!pkg_) {
                 throw new exports.LoadError(
                     "Package " + name + " does not exist");
             }
@@ -125,7 +131,7 @@ exports.loadPackage = function(name, version, type, callback) {
         },
         function(err) {
             if (err) throw err;
-            fs.readFile(pkgFile(name, type), this)
+            fs.readFile(self.pkgFile_(name, type), this)
         },
         function(err, data) {
             if (err) callback(err);
@@ -140,9 +146,9 @@ exports.loadPackage = function(name, version, type, callback) {
  *   for multi-file tar packages.
  * @param {functiom(Error=, Object=)} callback Passed the package metadata.
  */
-exports.savePackage = function(data, type, callback) {
-    if (type === 'el') exports.saveElisp(data.toString('utf8'), callback);
-    else if (type === 'tar') exports.saveTarball(data, callback);
+Backend.prototype.savePackage = function(data, type, callback) {
+    if (type === 'el') this.saveElisp(data.toString('utf8'), callback);
+    else if (type === 'tar') this.saveTarball(data, callback);
     else callback(new Error("Unknown filetype: " + type));
 };
 
@@ -152,7 +158,8 @@ exports.savePackage = function(data, type, callback) {
  * @param {string} file The name of the file where the Elisp code lives.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-exports.saveElispFile = function(file, callback) {
+Backend.prototype.saveElispFile = function(file, callback) {
+    var self = this;
     step(
         function() {fs.readFile(file, "utf8", this)},
         function(err, elisp) {
@@ -160,7 +167,7 @@ exports.saveElispFile = function(file, callback) {
               callback(err);
               return;
             }
-            exports.saveElisp(elisp, this);
+            self.saveElisp(elisp, this);
         }, callback);
 };
 
@@ -169,7 +176,8 @@ exports.saveElispFile = function(file, callback) {
  * @param {string} elisp The Elisp package.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-exports.saveElisp = function(elisp, callback) {
+Backend.prototype.saveElisp = function(elisp, callback) {
+    var self = this;
     var pkg;
     step(
         function() {
@@ -178,11 +186,11 @@ exports.saveElisp = function(elisp, callback) {
         },
         function(err) {
             if (err) throw err;
-            store.save(pkg.name, pkg, this);
+            self.store_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
-            fs.writeFile(pkgFile(pkg.name, 'el'), elisp, "utf8", this);
+            fs.writeFile(self.pkgFile_(pkg.name, 'el'), elisp, "utf8", this);
         },
         function(err) {callback(err, pkg)});
 };
@@ -192,18 +200,19 @@ exports.saveElisp = function(elisp, callback) {
  * @param {string} file The name of the tar file.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-exports.saveTarFile = function(file, callback) {
+Backend.prototype.saveTarFile = function(file, callback) {
+    var self = this;
     var pkg;
     step(
         function() {packageParser.parseTarFile(file, this)},
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            store.save(pkg.name, pkg, this);
+            self.store_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
-            util.run("mv", [file, pkgFile(pkg.name, 'tar')], this);
+            util.run("mv", [file, self.pkgFile_(pkg.name, 'tar')], this);
         },
         function(err) {callback(err, pkg)});
 };
@@ -214,18 +223,19 @@ exports.saveTarFile = function(file, callback) {
  * @param {Buffer} tar The tar data.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-exports.saveTarball = function(tar, callback) {
+Backend.prototype.saveTarball = function(tar, callback) {
+    var self = this;
     var pkg;
     step(
         function() {packageParser.parseTar(tar, this)},
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            store.save(pkg.name, pkg, this);
+            self.store_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
-            fs.writeFile(pkgFile(pkg.name, "tar"), tar, this);
+            fs.writeFile(self.pkgFile_(pkg.name, "tar"), tar, this);
         },
         function(err) {callback(err, pkg)});
 };
@@ -236,6 +246,6 @@ exports.saveTarball = function(tar, callback) {
  * @param {function(Error=, Array.<Object>=)} callback Passed a list of all
  *   package metadata.
  */
-exports.getPackages = function(callback) {
-    store.all(callback);
+Backend.prototype.getPackages = function(callback) {
+    this.store_.all(callback);
 };
