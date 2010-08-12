@@ -84,8 +84,10 @@ exports.create = function() {
         backend.loadPackage(
             name, _.map(version.split("."), Number), type, function(err, data, pkg) {
                 if (err) {
-                    if (err.name === "WrongVersionError") {
-                        res.send(err.message, {'Content-Type': 'text/plain'}, 404);
+                    if (err instanceof backend.LoadError) {
+                        res.send(err.message + "\n",
+                                 {'Content-Type': 'text/plain'},
+                                 404);
                     } else if (err.errno === process.ENOENT) {
                         res.send("Don't have any version of " +
                                  name + "." + type + "\n", 404);

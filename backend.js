@@ -71,6 +71,13 @@ function pkgFile(name, type) {
 };
 
 /**
+ * An error class raised when the backend fails to load a given package. Note
+ * that not all failed loads will cause this error in particular.
+ * @constructor
+ */
+exports.LoadError = util.errorClass('LoadError');
+
+/**
  * Initialize the backend. This must be called before any other backend
  * functions. Note that this function may actually block for a nontrivial amount
  * of time.
@@ -94,18 +101,27 @@ exports.loadPackage = function(name, version, type, callback) {
     step(
         function() {store.get(name, this)},
         function(err, pkg_) {
-            pkg = pkg_;
-
-            if (_.isEqual(pkg.version, version) &&
-                (pkg.type === "single" ? type === "el" : type === "tar")) {
-                return null;
+            if (!pkg) {
+                throw new exports.LoadError(
+                    "Package " + name + " does not exist");
             }
 
-            err = new Error("Don't have " + name + "." + type + " version " +
-                            version.join(".") + ", only version " +
-                            pkg.version.join(".") + "\n");
-            err.name = "WrongVersionError";
-            throw err;
+            pkg = pkg_;
+
+            if (pkg.type === "single" ? type !== "el" : type !== "tar") {
+                throw new exports.LoadError(
+                    "Package " + name + " is in " + pkg.type + " format, not " +
+                        type);
+            }
+
+            if (!_.isEqual(pkg.version, version)) {
+                throw new exports.LoadError(
+                    "Don't have " + name + "." + type + " version " +
+                        version.join(".") + ", only version " +
+                        pkg.version.join(".") + "\n");
+            }
+
+            return null;
         },
         function(err) {
             if (err) throw err;
