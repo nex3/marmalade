@@ -35,14 +35,15 @@ var HttpError = util.errorClass(function HttpError(code) {
  * and configuration set up for Jelly. To start it, just call
  * `.create().listen()`.
  * @param {string} dataDir The root of the Jelly backend's data store.
- * @return {express.Server}
+ * @param {function(Error=, express.Server=)} callback Called with the new
+ *   server.
  */
-exports.create = function(dataDir) {
+exports.create = function(dataDir, callback) {
     var app = express.createServer();
 
     /**
-     * The Jelly backend. This is null until until the server starts listening.
-     * @type {?backend.Backend}
+     * The Jelly backend. This will be set once the caller receives the app.
+     * @type {backend.Backend}
      */
     app.backend = null;
 
@@ -209,19 +210,27 @@ exports.create = function(dataDir) {
     });
 
 
-    /** ## Initialization
-     *
-     * Load the database before we start accepting incoming connections.
-     */
+    /** ## Initialization */
 
+    /**
+     * Tell the user when we're ready to accept connections.
+     */
     app.addListener('listening', function() {
-        console.log("Loading database...")
-        app.backend = backend.create(dataDir);
         var address = app.address();
         var hostname = address.address;
         if (hostname === "0.0.0.0") hostname = "localhost";
         console.log("Jelly's spread all over " + hostname + ":" + address.port);
     });
 
-    return app;
+    /**
+     * Initialize the backend before we let the user start the server.
+     */
+    console.log("Loading database...");
+    step(
+        function() {backend.create(dataDir, this)},
+        function(err, be) {
+            if (err) throw err;
+            app.backend = be;
+            return app;
+        }, callback);
 };

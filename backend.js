@@ -60,10 +60,12 @@ exports.LoadError = util.errorClass('LoadError');
  *k
  * @param {string} dataDir The root of the backend's data store. This is used
  *   for storing various different sorts of data.
+ * @param {function(Error=, Backend=} callback Called when the backend is fully
+ *   loaded.
  * @return {Backend}
  */
-exports.create = function(dataDir) {
-    return new Backend(dataDir);
+exports.create = function(dataDir, callback) {
+    new Backend(dataDir, callback);
 };
 
 /**
@@ -72,11 +74,14 @@ exports.create = function(dataDir) {
  *
  * @param {string} dataDir The root of the backend's data store. This is used
  *   for storing various different sorts of data.
+ * @param {function(Error=, Backend=} callback Called when the backend is fully
+ *   loaded.
  * @constructor
  */
-var Backend = function(dataDir) {
+var Backend = function(dataDir, callback) {
     this.dataDir_ = dataDir;
     this.store_ = nStore(dataDir + "/packages.db");
+    callback(null, this);
 };
 
 /**
