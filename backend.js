@@ -90,30 +90,30 @@ exports.init = function() {
  *   of the sort returned by packageParser.parse*.
  */
 exports.loadPackage = function(name, version, type, callback) {
-    var data;
+    var pkg;
     step(
-        function() {fs.readFile(pkgFile(name, type), this)},
-        function(err, data_) {
-            if (err) throw err;
-            data = data_;
-            packageParser.parsePackage(data, type, this);
-        },
-        function(err, pkg) {
-            if (err) {
-              callback(err);
-              return;
+        function() {store.get(name, this)},
+        function(err, pkg_) {
+            pkg = pkg_;
+
+            if (_.isEqual(pkg.version, version) &&
+                (pkg.type === "single" ? type === "el" : type === "tar")) {
+                return null;
             }
 
-            if (_.isEqual(pkg.version, version)) {
-                callback(null, data, pkg);
-                return;
-            }
-
-            err = new Error("Don't have " + name + ".el version " +
+            err = new Error("Don't have " + name + "." + type + " version " +
                             version.join(".") + ", only version " +
                             pkg.version.join(".") + "\n");
             err.name = "WrongVersionError";
-            callback(err);
+            throw err;
+        },
+        function(err) {
+            if (err) throw err;
+            fs.readFile(pkgFile(name, type), this)
+        },
+        function(err, data) {
+            if (err) callback(err);
+            else callback(null, data, pkg);
         });
 };
 
