@@ -221,28 +221,5 @@ exports.saveTarball = function(tar, callback) {
  *   package metadata.
  */
 exports.getPackages = function(callback) {
-    step(
-        function() {fs.readdir('packages', this)},
-        function(err, files) {
-            if (err) throw err;
-
-            var fileGroup = this.group();
-            _(files).each(function(file) {
-                var cb = fileGroup();
-                fs.readFile(pkgDir + '/' + file, function(err, data) {
-                    cb(null, [file, data]);
-                });
-            });
-        },
-        function(err, packages) {
-            if (err) throw err;
-            var pkgGroup = this.group();
-            _(packages).each(function(pkg) {
-                var file = pkg[0],
-                    data = pkg[1];
-                packageParser.parsePackage(
-                    data, file.match(/\.([a-z]+)$/)[1], pkgGroup());
-            });
-        },
-        callback);
+    store.all(callback);
 };
