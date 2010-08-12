@@ -254,10 +254,11 @@ Backend.prototype.saveTarball = function(tar, callback) {
 
 
 /**
- * Get a list of the metadata for all packages in the archive.
- * @param {function(Error=, Array.<Object>=)} callback Passed a list of all
- *   package metadata.
+ * Get a stream of the package metadata for all packages.
+ * @return {EventEmitter} A stream of package metadata. This works just like a
+ *   standard node stream, except that the data are package metadata objects.
  */
-Backend.prototype.getPackages = function(callback) {
-    this.store_.all(callback);
+Backend.prototype.packageStream = function() {
+    // Currently, the stream from the store is actually precisely what we want.
+    return this.store_.stream();
 };

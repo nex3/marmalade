@@ -1,0 +1,9 @@
+(
+  <%- symbol(pkg.name) %> .
+    [
+      <%- list(pkg.version) %>
+      <%- list(pkg.requires) %>
+      <%- string(pkg.description) %>
+      <%- pkg.type %>
+    ]
+)

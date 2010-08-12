@@ -113,22 +113,33 @@ exports.create = function(dataDir, callback) {
 
     /**
      * Gets the list of all packages available. This is sent as an Elisp sexp
-     * representation of the package metadata.
+     * representation of the package metadata. This is actually streaming,
+     * although `package.el` doesn't care.
      */
     app.get('/packages/archive-contents', function(req, res, next) {
-        step(
-            function() {app.backend.getPackages(this)},
-            function(err, pkgs) {
-                if (err) throw err;
-                res.render("archive-contents.ejs", {
-                    locals: helpers.extend({packages: pkgs}),
-                    layout: false
-                }, this);
-            },
-            function(err, str) {
-                if (err) throw err;
-                res.send(str, {'Content-Type': 'text/plain'});
-            }, next);
+        var pkgStream = app.backend.packageStream();
+        var first = true;
+
+        pkgStream.on('data', function(pkg) {
+            res.write(res.partial("archive-contents.ejs", {
+                locals: helpers.extend({pkg: pkg}),
+                layout: false
+            }));
+        });
+
+        pkgStream.on('error', function(err) {
+            sys.error(err.stack);
+            res.write(' )');
+            res.end();
+        });
+
+        pkgStream.on('end', function() {
+            res.write(' )');
+            res.end();
+        });
+
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.write('(1 ');
     });
 
     /**
