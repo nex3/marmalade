@@ -124,22 +124,22 @@ exports.create = function(dataDir, callback) {
             res.write(res.partial("archive-contents.ejs", {
                 locals: helpers.extend({pkg: pkg}),
                 layout: false
-            }));
+            }).replace(/\n */mg, ''));
         });
 
         pkgStream.on('error', function(err) {
             sys.error(err.stack);
-            res.write(' )');
+            res.write(')');
             res.end();
         });
 
         pkgStream.on('end', function() {
-            res.write(' )');
+            res.write(')');
             res.end();
         });
 
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write('(1 ');
+        res.write('(1');
     });
 
     /**
