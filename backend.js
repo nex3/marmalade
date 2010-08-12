@@ -35,6 +35,7 @@
 
 var fs = require("fs"),
     sys = require("sys"),
+    crypto = require("crypto"),
     step = require("step"),
     _ = require("underscore")._,
     nStore = require("nStore"),
@@ -84,9 +85,11 @@ var Backend = function(dataDir, callback) {
     var self = this;
     step(
         function () {util.run("mkdir", ["-p", dataDir + "/packages"], this)},
+        function (err) {util.run("mkdir", ["-p", dataDir + "/packages"], this)},
         function (err) {
             if (err) throw err;
-            self.store_ = nStore(dataDir + "/packages.db");
+            self.packages_ = nStore(dataDir + "/packages.db");
+            self.users_ = nStore(dataDir + "/users.db");
             return self;
         }, callback);
 };
@@ -118,7 +121,7 @@ Backend.prototype.loadPackage = function(name, version, type, callback) {
     var self = this;
     var pkg;
     step(
-        function() {self.store_.get(name, this)},
+        function() {self.packages_.get(name, this)},
         function(err, pkg_) {
             if (!pkg_) {
                 throw new exports.LoadError(
@@ -199,7 +202,7 @@ Backend.prototype.saveElisp = function(elisp, callback) {
         },
         function(err) {
             if (err) throw err;
-            self.store_.save(pkg.name, pkg, this);
+            self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
@@ -221,7 +224,7 @@ Backend.prototype.saveTarFile = function(file, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            self.store_.save(pkg.name, pkg, this);
+            self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
@@ -244,7 +247,7 @@ Backend.prototype.saveTarball = function(tar, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            self.store_.save(pkg.name, pkg, this);
+            self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
@@ -261,5 +264,81 @@ Backend.prototype.saveTarball = function(tar, callback) {
  */
 Backend.prototype.packageStream = function() {
     // Currently, the stream from the store is actually precisely what we want.
-    return this.store_.stream();
+    return this.packages_.stream();
+};
+
+
+exports.RegistrationError = util.errorClass('RegistrationError');
+
+/**
+ * Add a new user.
+ *
+ * @param {string} name The name of the user to register.
+ * @param {string} password The user's password.
+ * @param {function(Error=, Object=)} Passed the newly-created user object.
+ */
+Backend.prototype.registerUser = function(name, password, callback) {
+    var self = this;
+    var key = name.toLowerCase();;
+    var user;
+    step(
+        function() {
+            if (!name || name.length === 0)
+                throw new exports.RegistrationError("Usernames can't be empty");
+            if (!password || password.length <= 5)
+                throw new exports.RegistrationError(
+                    "Passwords must be at least six characters long.");
+            if (self.users_.index[key])
+                throw new exports.RegistrationError(
+                    "User " + name + " already exists");
+
+            util.run("openssl", ["rand", "-base64", "32"], this);
+        },
+        function(err, salt) {
+            if (err) throw err;
+            var hash = crypto.createHash('sha1');
+            hash.update(password);
+            hash.update(salt);
+            var digest = hash.digest('base64');
+
+            user = {
+                name: name,
+                digest: digest,
+                salt: salt,
+                packages: []
+            };
+            self.users_.save(key, user, this);
+        },
+        function(err) {
+            if (err) throw err;
+            return user;
+        }, callback);
+};
+
+
+/**
+ * Check the validity of a user's password and get that user's object.
+ * @param {string} name The user's name.
+ * @param {string} password The user's password.
+ * @param {function(Error=, Object=} callback Passed the user object, or null if
+ *   the username or password was invalid.
+ */
+Backend.prototype.loadUser = function(name, password, callback) {
+    var key = name.toLowerCase();
+    if (!this.users_.index[key]) callback(null, null);
+
+    var self = this;
+    step(
+        function() {self.users_.get(name.toLowerCase(), this)},
+        function(err, user) {
+            if (err) throw err;
+            if (!user) return null;
+
+            var hash = crypto.createHash('sha1');
+            hash.update(password);
+            hash.update(user.salt);
+            if (hash.digest('base64') != user.digest) return null;
+
+            return user;
+        }, callback);
 };
