@@ -97,6 +97,7 @@ var Backend = function(dataDir, callback) {
  * @param {string} name The name of the package.
  * @param {string} type "el" for an Elisp package, "tar" for a tarball pacakge.
  * @return {string} The path to the actual package file.
+ * @private
  */
 Backend.prototype.pkgFile_ = function(name, type) {
     return this.dataDir_ + '/packages/' + name.replace(/\.\.+/g, '.') +
