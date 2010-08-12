@@ -57,9 +57,10 @@ exports.LoadError = util.errorClass('LoadError');
 /**
  * Initialize a Jelly backend. Note that this function may actually block for a
  * nontrivial amount of time.
- *k
+ *
  * @param {string} dataDir The root of the backend's data store. This is used
- *   for storing various different sorts of data.
+ *   for storing various different sorts of data. It will be created if it
+ *   doesn't already exist.
  * @param {function(Error=, Backend=} callback Called when the backend is fully
  *   loaded.
  * @return {Backend}
@@ -80,8 +81,14 @@ exports.create = function(dataDir, callback) {
  */
 var Backend = function(dataDir, callback) {
     this.dataDir_ = dataDir;
-    this.store_ = nStore(dataDir + "/packages.db");
-    callback(null, this);
+    var self = this;
+    step(
+        function () {util.run("mkdir", ["-p", dataDir + "/packages"], this)},
+        function (err) {
+            if (err) throw err;
+            self.store_ = nStore(dataDir + "/packages.db");
+            return self;
+        }, callback);
 };
 
 /**
