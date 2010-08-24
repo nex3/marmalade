@@ -210,19 +210,38 @@ exports.create = function(dataDir, callback) {
      */
 
     /**
-     * Uploads a package. This takes a multipart form post with a single Elisp
-     * or tar file labeled `package`. The type of the package is inferred from
-     * its filename.
+     * Uploads a package. This takes a multipart form post with `username` and
+     * `token` fields, and a single Elisp or tar file labeled `package`. The
+     * type of the package is inferred from its filename.
      *
      * A successful response will contain the `package` key, which is the
      * package metadata (as described in backend.js).
      */
     app.post('/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
+        var files;
         step(
             function() {form.parse(req, this)},
-            function(err, fields, files) {
+            function(err, fields, files_) {
                 if (err) throw err;
+                if (!fields.username) {
+                    throw new HttpError("Username parameter required", 400);
+                } else if (!fields.token) {
+                    throw new HttpError("Token parameter required", 400);
+                } else if (!files_['package']) {
+                    throw new HttpError(
+                        "Package file upload parameter required", 400);
+                } else {
+                    files = files_;
+                    app.backend.loadUserWithToken(
+                        fields.username, fields.token, this);
+                }
+            },
+            function(err, user) {
+                if (err) throw err;
+                if (!user) {
+                    throw new HttpError("Username or token invalid", 400);
+                }
 
                 var ext = files['package'].filename.match(/\.([^.]+)$/);
                 if (!ext) {

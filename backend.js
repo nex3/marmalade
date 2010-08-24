@@ -349,3 +349,25 @@ Backend.prototype.loadUser = function(name, password, callback) {
             return user;
         }, callback);
 };
+
+
+/**
+ * Check the validity of a user's token and get that user's object.
+ * @param {string} name The user's name.
+ * @param {string} token The user's token.
+ * @param {function(Error=, Object=} callback Passed the user object, or null if
+ *   the username or token was invalid.
+ */
+Backend.prototype.loadUserWithToken = function(name, token, callback) {
+    var key = name.toLowerCase();
+    if (!this.users_.index[key]) callback(null, null);
+
+    var self = this;
+    step(
+        function() {self.users_.get(name.toLowerCase(), this)},
+        function(err, user) {
+            if (err) throw err;
+            if (!user || user.token !== token) return null;
+            return user;
+        }, callback);
+};
