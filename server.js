@@ -10,13 +10,21 @@ var Buffer = require("buffer").Buffer,
     queryString = require("querystring"),
     sys = require("sys"),
     connect = require("connect"),
+    mime = require("connect/utils").mime,
     express = require("express"),
     mustache = require("mustache"),
     step = require("step");
     formidable = require("formidable"),
+    _ = require("underscore")._,
     backend = require("./backend"),
     helpers = require("./helpers"),
+    sexp = require("./sexp").sexp,
     util = require("./util");
+
+/**
+ * Teach connect the Elisp mime type.
+ */
+mime.types['.el'] = 'text/x-script.elisp';
 
 /**
  * An error class raised when we want to send back a specific HTTP error code.
@@ -29,6 +37,39 @@ var Buffer = require("buffer").Buffer,
 var HttpError = util.errorClass(function HttpError(code) {
     this.code = code;
 });
+
+/**
+ * Connect middleware that extends the request and response objects with useful
+ * Jelly-specific functionality.
+ */
+function extensions(req, res, next) {
+    /**
+     * Extend res.send so that sent objects are rendered as either Elisp or
+     * JSON, depending on the Accept headers.
+     */
+    var oldSend = res.send;
+    res.send = function(body, headers, status) {
+        // Allow status as second arg
+        if (typeof headers === 'number') {
+            status = headers,
+            headers = null;
+        }
+
+        // Defaults
+        status = status || 200;
+        headers = headers || {};
+
+        if (typeof body === 'object' && !(body instanceof Buffer) &&
+              req.accepts('el') && !req.accepts('json')) {
+            res.contentType('.el');
+            body = sexp(body);
+        }
+
+        oldSend.call(res, body, headers, status);
+    };
+
+    next();
+};
 
 /**
  * Create a Jelly server. This is a standard Express application, with routes
@@ -60,6 +101,7 @@ exports.create = function(dataDir, callback) {
         app.use(connect.gzip());
         app.use(connect.conditionalGet());
         app.use(connect.bodyDecoder());
+        app.use(extensions);
     });
 
 
@@ -154,13 +196,26 @@ exports.create = function(dataDir, callback) {
     /** ## Jelly Interface
      *
      * These routes are the API we expose in addition to that required by ELPA.
-     * So far this just has to do with uploading packages.
+     * So far this includes uploading packages and handling users.
+     *
+     * All responses to Jelly-specific API calls can be either JSON or Elisp.
+     * Elisp responses will be sent if the user agent includes
+     * 'text/x-script.elisp' in its Accept header; otherwise, JSON will be sent.
+     * Note that if the user agent accepts both JSON and Elisp, JSON will be
+     * preferred.
+     *
+     * All responses will include a human-readable 'message' key (for objects in
+     * JSON and alists in Elisp). They may also contain other keys specific to
+     * the request in question.
      */
 
     /**
      * Uploads a package. This takes a multipart form post with a single Elisp
      * or tar file labeled `package`. The type of the package is inferred from
      * its filename.
+     *
+     * A successful response will contain the `package` key, which is the
+     * package metadata (as described in backend.js).
      */
     app.post('/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
@@ -171,10 +226,9 @@ exports.create = function(dataDir, callback) {
 
                 var ext = files['package'].filename.match(/\.([^.]+)$/);
                 if (!ext) {
-                    res.send("Couldn't determine file extension for " +
-                               files['package'].filename,
-                            400);
-                    return;
+                    throw new HttpError("Couldn't determine file extension " +
+                                        "for " + files['package'].filename,
+                                        400);
                 }
                 ext = ext[1];
 
@@ -191,14 +245,22 @@ exports.create = function(dataDir, callback) {
                     throw new HttpError(err.message, 400);
                 } else if (err) throw err;
 
-                res.send("Saved " + pkg.name + ", version " +
-                         pkg.version.join(".") + "\n",
-                         {'Content-Type': 'text/plain'});
+                res.send({
+                    message: "Saved " + pkg.name + ", version " +
+                          pkg.version.join("."),
+                    'package': pkg
+                });
             }, next);
     });
 
     /**
-     * Registers a new user. This should have "name" and "password" parameters.
+     * Registers a new user. This should have `name` and `password` parameters.
+     *
+     * A successful response will contain the following keys:
+     *
+     * * `name`: The user's name (presumably the same as the request parameter).
+     * * `token`: The user's authentication token, which is sent up to validate
+     *     the user's identity.
      */
     app.post('/users', function(req, res, next) {
         step(
@@ -211,8 +273,10 @@ exports.create = function(dataDir, callback) {
                 if (err instanceof backend.RegistrationError) {
                     throw new HttpError(err.message, 400);
                 } else if (err) throw err;
-                res.send("Successfully registered " + user.name + "\n",
-                         {'Content-Type': 'text/plain'});
+                res.send({
+                    message: "Successfully registered " + user.name,
+                    name: user.name
+                });
             }, next);
     });
 
@@ -224,8 +288,7 @@ exports.create = function(dataDir, callback) {
      */
     app.error(function(err, req, res, next) {
         if (err instanceof HttpError) {
-            res.send(err.message + "\n", {'Content-Type': 'text/plain'},
-                     err.code);
+            res.send({message: err.message}, err.code);
         } else next(err, req, res);
     });
 

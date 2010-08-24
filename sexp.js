@@ -60,7 +60,7 @@ exports.list = function(arr) {
  * @return {string}
  */
 exports.vector = function(arr) {
-    return "[" + vector(arr) + "]";
+    return "[" + listLike(arr) + "]";
 };
 
 /**
@@ -79,6 +79,19 @@ exports.bool = function(bool) {
  */
 exports.number = function(num) {
     return num.toString();
+};
+
+/**
+ * Converts a JS object to an Elisp alist. The keys are all converted to
+ * symbols.
+ * @param {Object} obj
+ * @return {string}
+ */
+exports.alist = function(obj) {
+    console.log(sys.inspect(obj));
+    return "(" + _.map(obj, function(val, key) {
+        return "(" + exports.symbol(key) + " . " + exports.sexp(val) + ")";
+    }).join("") + ")";
 };
 
 /**
@@ -120,6 +133,6 @@ exports.sexp = function(obj) {
     } else if (_.isNumber(obj)) {
         return exports.number(obj);
     } else {
-        throw new Error("Cannot convert to sexp: " + sys.inspect(obj));
+        return exports.alist(obj);
     }
 };
