@@ -19,6 +19,7 @@ var Buffer = require("buffer").Buffer,
     backend = require("./backend"),
     helpers = require("./helpers"),
     sexp = require("./sexp").sexp,
+    sexpParser = require("./sexpParser"),
     util = require("./util");
 
 /**
@@ -272,8 +273,10 @@ exports.create = function(dataDir, callback) {
                 }
             },
             function(err, pkg) {
-                if (err && err.name === 'SyntaxError') {
+                if (err && err instanceof sexpParser.SyntaxError) {
                     throw new HttpError(err.message, 400);
+                } else if (err && err instanceof backend.PermissionsError) {
+                    throw new HttpError(err.message, 403);
                 } else if (err) throw err;
 
                 res.send({

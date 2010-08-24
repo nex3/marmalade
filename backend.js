@@ -158,6 +158,21 @@ Backend.prototype.loadPackage = function(name, version, type, callback) {
         });
 };
 
+
+/**
+ * An error class that's raised when users try to modify packages they don't
+ * own.
+ * @constructor
+ * @param {Object} user The user object.
+ * @param {Object} package The package the user attempted to modify, in
+ *     unmodified form.
+ */
+exports.PermissionsError = util.errorClass(
+    function PermissionsError(user, pkg) {
+        this.user = user;
+        this.pkg = pkg;
+    });
+
 /**
  * Save a package, either in Elisp or Tarball format, to the archive.
  * @param {Buffer} data The contents of the package.
@@ -204,8 +219,7 @@ Backend.prototype.saveElisp = function(elisp, user, callback) {
     step(
         function() {
             pkg = packageParser.parseElisp(elisp);
-            pkg.owners[user.name.toLowerCase()] = true;
-            return null;
+            self.checkOwner_(pkg, user, this);
         },
         function(err) {
             if (err) throw err;
@@ -217,7 +231,6 @@ Backend.prototype.saveElisp = function(elisp, user, callback) {
         },
         function(err) {
             if (err) throw err;
-            user.packages[pkg.name] = true;
             self.saveUser(user, this);
         },
         function(err) {callback(err, pkg)});
@@ -237,7 +250,10 @@ Backend.prototype.saveTarFile = function(file, user, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            pkg.owners[user.name.toLowerCase()] = true;
+            self.checkOwner_(pkg, user, this);
+        },
+        function(err) {
+            if (err) throw err;
             self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
@@ -246,7 +262,6 @@ Backend.prototype.saveTarFile = function(file, user, callback) {
         },
         function(err) {
             if (err) throw err;
-            user.packages[pkg.name] = true;
             self.saveUser(user, this);
         },
         function(err) {callback(err, pkg)});
@@ -267,7 +282,9 @@ Backend.prototype.saveTarball = function(tar, user, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
-            pkg.owners[user.name.toLowerCase()] = true;
+            self.checkOwner_(pkg, user, this);
+        },
+        function(err) {
             self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
@@ -276,10 +293,43 @@ Backend.prototype.saveTarball = function(tar, user, callback) {
         },
         function(err) {
             if (err) throw err;
-            user.packages[pkg.name] = true;
             self.saveUser(user, this);
         },
         function(err) {callback(err, pkg)});
+};
+
+
+/**
+ * Ensures that the given user is in fact an owner of the given (just parsed)
+ * package. If the package does not yet exist, adds the user as an owner.
+ *
+ * @param {Object} pkg The package metadata.
+ * @param {Object} uesr The user object.
+ * @param {Function(Error=)} callback
+ */
+Backend.prototype.checkOwner_ = function(pkg, user, callback) {
+    var name = user.name.toLowerCase();
+    if (!this.packages_.index[pkg.name]) {
+        pkg.owners[name] = true;
+        user.packages[pkg.name] = true;
+        callback();
+        return;
+    }
+
+    var self = this;
+    step(
+        function() {self.packages_.get(pkg.name, this)},
+        function(err, oldPkg) {
+            if (err) throw err;
+            if (!oldPkg.owners[name]) {
+                throw new exports.PermissionsError(
+                    'User "' + user.name + '" does not own package "' +
+                        oldPkg.name + '"',
+                    user, oldPkg);
+            }
+            pkg.owners = oldPkg.owners;
+            return null;
+        }, callback);
 };
 
 
