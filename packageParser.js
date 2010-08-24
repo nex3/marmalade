@@ -160,7 +160,8 @@ exports.parseElisp = function(elisp) {
         commentary: commentary,
         requires: requires,
         version: version,
-        type: "single"
+        type: "single",
+        owners: {}
     };
 };
 
@@ -187,7 +188,8 @@ function parseDeclaration(elisp) {
         description: desc,
         requires: requires,
         version: version,
-        type: "tar"
+        type: "tar",
+        owners: {}
     };
 };
 

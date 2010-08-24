@@ -20,6 +20,8 @@
  *         field.
  *   * *version*: An array of numbers representing the dot-separated version.
  *   * *type*: Either "single" (for an Elisp file) or "tar" (for a tarball).
+ *   * *owners*: A set of names of users who have the right to post updates for
+ *         the package.
  *
  * For example, the metadata for `sass-mode` version 3.0.13 might look like:
  *
@@ -29,7 +31,8 @@
  *       commentary: "Blah blah blah",
  *       requires: [["haml-mode", [3, 0, 13]]],
  *       version: [3, 0, 13],
- *       type: "single"
+ *       type: "single",
+ *       owners: {"nex3": true}
  *     }
  */
 
@@ -158,13 +161,14 @@ Backend.prototype.loadPackage = function(name, version, type, callback) {
 /**
  * Save a package, either in Elisp or Tarball format, to the archive.
  * @param {Buffer} data The contents of the package.
+ * @param {Object} user The uploader of the package.
  * @param {string} type "el" for single-file elisp packages or "tar"
  *   for multi-file tar packages.
  * @param {functiom(Error=, Object=)} callback Passed the package metadata.
  */
-Backend.prototype.savePackage = function(data, type, callback) {
+Backend.prototype.savePackage = function(data, user, type, callback) {
     if (type === 'el') this.saveElisp(data.toString('utf8'), callback);
-    else if (type === 'tar') this.saveTarball(data, callback);
+    else if (type === 'tar') this.saveTarball(data, user, callback);
     else callback(new Error("Unknown filetype: " + type));
 };
 
@@ -172,9 +176,10 @@ Backend.prototype.savePackage = function(data, type, callback) {
  * Save an Elisp package that currently resides in a file on disk to the
  * archive.
  * @param {string} file The name of the file where the Elisp code lives.
+ * @param {Object} user The uploader of the Elisp package.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-Backend.prototype.saveElispFile = function(file, callback) {
+Backend.prototype.saveElispFile = function(file, user, callback) {
     var self = this;
     step(
         function() {fs.readFile(file, "utf8", this)},
@@ -183,21 +188,23 @@ Backend.prototype.saveElispFile = function(file, callback) {
               callback(err);
               return;
             }
-            self.saveElisp(elisp, this);
+            self.saveElisp(elisp, user, this);
         }, callback);
 };
 
 /**
  * Save an in-memory Elisp package to the archive.
  * @param {string} elisp The Elisp package.
+ * @param {Object} user The uploader of the Elisp package.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-Backend.prototype.saveElisp = function(elisp, callback) {
+Backend.prototype.saveElisp = function(elisp, user, callback) {
     var self = this;
     var pkg;
     step(
         function() {
             pkg = packageParser.parseElisp(elisp);
+            pkg.owners[user.name.toLowerCase()] = true;
             return null;
         },
         function(err) {
@@ -208,15 +215,21 @@ Backend.prototype.saveElisp = function(elisp, callback) {
             if (err) throw err;
             fs.writeFile(self.pkgFile_(pkg.name, 'el'), elisp, "utf8", this);
         },
+        function(err) {
+            if (err) throw err;
+            user.packages[pkg.name] = true;
+            self.saveUser(user, this);
+        },
         function(err) {callback(err, pkg)});
 };
 
 /**
  * Save a tarred package that currently resides in a file on disk to the archive.
  * @param {string} file The name of the tar file.
+ * @param {Object} user The uploader of the tar file.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-Backend.prototype.saveTarFile = function(file, callback) {
+Backend.prototype.saveTarFile = function(file, user, callback) {
     var self = this;
     var pkg;
     step(
@@ -224,11 +237,17 @@ Backend.prototype.saveTarFile = function(file, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
+            pkg.owners[user.name.toLowerCase()] = true;
             self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
             util.run("mv", [file, self.pkgFile_(pkg.name, 'tar')], this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.packages[pkg.name] = true;
+            self.saveUser(user, this);
         },
         function(err) {callback(err, pkg)});
 };
@@ -237,9 +256,10 @@ Backend.prototype.saveTarFile = function(file, callback) {
 /**
  * Save an in-memory tarred package to the archive.
  * @param {Buffer} tar The tar data.
+ * @param {Object} user The uploader of the tarball.
  * @param {function(Error=, Object=)} callback Passed the package metadata.
  */
-Backend.prototype.saveTarball = function(tar, callback) {
+Backend.prototype.saveTarball = function(tar, user, callback) {
     var self = this;
     var pkg;
     step(
@@ -247,11 +267,17 @@ Backend.prototype.saveTarball = function(tar, callback) {
         function(err, pkg_) {
             if (err) throw err;
             pkg = pkg_;
+            pkg.owners[user.name.toLowerCase()] = true;
             self.packages_.save(pkg.name, pkg, this);
         },
         function(err) {
             if (err) throw err;
             fs.writeFile(self.pkgFile_(pkg.name, "tar"), tar, this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.packages[pkg.name] = true;
+            self.saveUser(user, this);
         },
         function(err) {callback(err, pkg)});
 };
@@ -312,7 +338,7 @@ Backend.prototype.registerUser = function(name, password, callback) {
                 digest: digest,
                 salt: salt,
                 token: token,
-                packages: []
+                packages: {}
             };
             self.users_.save(key, user, this);
         },
@@ -320,6 +346,23 @@ Backend.prototype.registerUser = function(name, password, callback) {
             if (err) throw err;
             return user;
         }, callback);
+};
+
+
+/**
+ * Save an update to an existing user record.
+ *
+ * @param {Object} user The user object.
+ * @param {function(Error=)} callback
+ */
+Backend.prototype.saveUser = function(user, callback) {
+    var key = user.name.toLowerCase();
+    if (!this.users_.index[key]) {
+        callback(new Error("Trying to save user " + user.name + ", who " +
+                           "doesn't exist"));
+    } else {
+        this.users_.save(key, user, callback);
+    }
 };
 
 

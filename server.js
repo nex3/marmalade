@@ -61,11 +61,22 @@ function extensions(req, res, next) {
 
         if (typeof body === 'object' && !(body instanceof Buffer) &&
               req.accepts('el') && !req.accepts('json')) {
-            res.contentType('.el');
+            this.contentType('.el');
             body = sexp(body);
         }
 
-        oldSend.call(res, body, headers, status);
+        oldSend.call(this, body, headers, status);
+    };
+
+    /**
+     * Gets a parameter, or throws an error if it doesn't exist.
+     * @param {string} name The name of the parameter.
+     * @return {string} value The value of the paramter.
+     */
+    req.requiredParam = function(name) {
+        var val = this.param(name);
+        if (val) return val;
+        throw new HttpError('Required parameter "' + name + '" not given', 400);
     };
 
     next();
@@ -252,9 +263,10 @@ exports.create = function(dataDir, callback) {
                 ext = ext[1];
 
                 if (ext === "tar") {
-                    app.backend.saveTarFile(files['package'].path, this);
+                    app.backend.saveTarFile(files['package'].path, user, this);
                 } else if (ext === "el") {
-                    app.backend.saveElispFile(files['package'].path, this);
+                    app.backend.saveElispFile(
+                        files['package'].path, user, this);
                 } else {
                     throw new HttpError("Unkown file extension: " + ext, 400);
                 }
@@ -284,8 +296,8 @@ exports.create = function(dataDir, callback) {
     app.post('/users', function(req, res, next) {
         step(
             function() {
-                app.backend.registerUser(req.param('name'),
-                                         req.param('password'),
+                app.backend.registerUser(req.requiredParam('name'),
+                                         req.requiredParam('password'),
                                          this);
             },
             function(err, user) {
