@@ -279,7 +279,8 @@ exports.RegistrationError = util.errorClass('RegistrationError');
  */
 Backend.prototype.registerUser = function(name, password, callback) {
     var self = this;
-    var key = name.toLowerCase();;
+    var key = name.toLowerCase();
+    var token;
     var user;
     step(
         function() {
@@ -294,6 +295,11 @@ Backend.prototype.registerUser = function(name, password, callback) {
 
             util.run("openssl", ["rand", "-base64", "32"], this);
         },
+        function(err, token_) {
+            if (err) throw err;
+            token = token_.replace(/\n$/, '');
+            util.run("openssl", ["rand", "-base64", "32"], this);
+        },
         function(err, salt) {
             if (err) throw err;
             var hash = crypto.createHash('sha1');
@@ -305,6 +311,7 @@ Backend.prototype.registerUser = function(name, password, callback) {
                 name: name,
                 digest: digest,
                 salt: salt,
+                token: token,
                 packages: []
             };
             self.users_.save(key, user, this);

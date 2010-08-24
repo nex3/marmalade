@@ -275,7 +275,8 @@ exports.create = function(dataDir, callback) {
                 } else if (err) throw err;
                 res.send({
                     message: "Successfully registered " + user.name,
-                    name: user.name
+                    name: user.name,
+                    token: user.token
                 });
             }, next);
     });
