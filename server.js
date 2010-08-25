@@ -315,6 +315,32 @@ exports.create = function(dataDir, callback) {
             }, next);
     });
 
+    /**
+     * Logs a user in; that is, retrieves the authentication token for a user.
+     * This should have `name` and `password` parameters.
+     *
+     * A successful response will contain the following keys:
+     *
+     * * `name`: The user's name (presumably the same as the request parameter).
+     * * `token`: The user's authentication token, which is sent up to validate
+     *     the user's identity.
+     */
+    app.post('/users/login', function(req, res, next) {
+        step(
+            function() {
+                app.backend.loadUser(req.requiredParam('name'),
+                                     req.requiredParam('password'),
+                                     this);
+            },
+            function(err, user) {
+                if (err) throw err;
+                res.send({
+                    message: 'Logged in as "' + user.name + '"',
+                    token: user.token
+                });
+            }, next);
+    });
+
 
     /** ## Error Handling */
 
