@@ -229,7 +229,7 @@ exports.create = function(dataDir, callback) {
      * A successful response will contain the `package` key, which is the
      * package metadata (as described in backend.js).
      */
-    app.post('/packages', function(req, res, next) {
+    app.post('/v1/packages', function(req, res, next) {
         var form = new formidable.IncomingForm();
         var files;
         step(
@@ -296,7 +296,7 @@ exports.create = function(dataDir, callback) {
      * * `token`: The user's authentication token, which is sent up to validate
      *     the user's identity.
      */
-    app.post('/users', function(req, res, next) {
+    app.post('/v1/users', function(req, res, next) {
         step(
             function() {
                 app.backend.registerUser(req.requiredParam('name'),
@@ -325,7 +325,7 @@ exports.create = function(dataDir, callback) {
      * * `token`: The user's authentication token, which is sent up to validate
      *     the user's identity.
      */
-    app.post('/users/login', function(req, res, next) {
+    app.post('/v1/users/login', function(req, res, next) {
         step(
             function() {
                 app.backend.loadUser(req.requiredParam('name'),
