@@ -12,7 +12,6 @@ var Buffer = require("buffer").Buffer,
     connect = require("connect"),
     mime = require("connect/utils").mime,
     express = require("express"),
-    mustache = require("mustache"),
     step = require("step");
     formidable = require("formidable"),
     _ = require("underscore")._,
