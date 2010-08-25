@@ -222,7 +222,7 @@ exports.create = function(dataDir, callback) {
      */
 
     /**
-     * Uploads a package. This takes a multipart form post with `username` and
+     * Uploads a package. This takes a multipart form post with `name` and
      * `token` fields, and a single Elisp or tar file labeled `package`. The
      * type of the package is inferred from its filename.
      *
@@ -236,8 +236,8 @@ exports.create = function(dataDir, callback) {
             function() {form.parse(req, this)},
             function(err, fields, files_) {
                 if (err) throw err;
-                if (!fields.username) {
-                    throw new HttpError("Username parameter required", 400);
+                if (!fields.name) {
+                    throw new HttpError("Name parameter required", 400);
                 } else if (!fields.token) {
                     throw new HttpError("Token parameter required", 400);
                 } else if (!files_['package']) {
@@ -246,7 +246,7 @@ exports.create = function(dataDir, callback) {
                 } else {
                     files = files_;
                     app.backend.loadUserWithToken(
-                        fields.username, fields.token, this);
+                        fields.name, fields.token, this);
                 }
             },
             function(err, user) {
