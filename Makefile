@@ -4,7 +4,8 @@ clean:
 	rm doc.html
 
 
-doc.html: backend.js server.js helpers.js packageParser.js sexpParser.js sexp.js util.js
+doc.html: lib/backend.js lib/server.js lib/helpers.js lib/packageParser.js \
+          lib/sexpParser.js lib/sexp.js lib/util.js
 	dox --title ${TITLE} $^ > $@
 
 doc: doc.html
