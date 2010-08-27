@@ -17,9 +17,13 @@ html/index.html: README.md
 	mkdir -p html
 	ronn -5 $^ > $@
 
+html/api.html: doc/api.md
+	mkdir -p html
+	ronn -5 $^ > $@
+
 README.html: html/index.html
 	ln -sf $^ $@
 
-html-doc: README.html html/code.html html/index.html
+html-doc: README.html html/code.html html/index.html html/api.html
 
 doc: html-doc
