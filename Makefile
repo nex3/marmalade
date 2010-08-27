@@ -3,7 +3,7 @@ TITLE="Jelly Documentation"
 default: doc
 
 clean:
-	rm -r man README.html
+	rm -rf man README.html
 
 # This only works with the Ruby ronn at time of writing, which is really fine
 # because the JS one is pretty bare-bones.
@@ -16,12 +16,12 @@ man/code.html: ${CODE}
 	mkdir -p html
 	dox --title ${TITLE} $^ > $@
 
-README.html: man/jelly.7.man
+README.html: man/jelly.7
 	ln -sf $^ $@
 
-man/%.man: doc/%.md
+man/%: doc/%.md
 	mkdir -p man
 	${RONN} -r $^ > $@
-	${RONN} -5 $^ > $(@:man=html)
+	${RONN} -5 $^ > $@.html
 
-doc: README.html man/code.html man/jelly.7.man man/jelly.1.man man/jelly-api.7.man
+doc: README.html man/code.html man/jelly.7 man/jelly.1 man/api.7

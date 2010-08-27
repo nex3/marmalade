@@ -14,5 +14,6 @@
     },
     "directories": { "lib": "./lib" },
     "engines": { "node": "= 0.1.103" },
-    "bin": { "jelly": "./bin/jelly.js" }
+    "bin": { "jelly": "./bin/jelly.js" },
+    "man": [ "./man/jelly.7", "./man/jelly.1", "./man/api.7" ]
 }
