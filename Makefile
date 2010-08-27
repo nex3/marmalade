@@ -24,6 +24,18 @@ html/api.html: doc/api.md
 README.html: html/index.html
 	ln -sf $^ $@
 
-html-doc: README.html html/code.html html/index.html html/api.html
+html: README.html html/code.html html/index.html html/api.html
 
-doc: html-doc
+
+man/jelly.7.man: README.md
+	mkdir -p man
+	ronn -r $^ > $@
+
+man/jelly-api.7.man: doc/api.md
+	mkdir -p man
+	ronn -r $^ > $@
+
+man: man/jelly.7.man man/jelly-api.7.man
+
+
+doc: html man

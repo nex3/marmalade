@@ -1,4 +1,7 @@
-# Jelly - A Dynamic ELPA Server
+jelly(7) -- spreadable elisp
+============================
+
+## SUMMARY
 
 Jelly is an Emacs Lisp package server that allows authors to easily upload their
 packages. It follows the protocol expected by `package.el`, the standard Emacs
@@ -6,7 +9,7 @@ package manager, and so can be used in conjunction with the [official GNU
 repository](http://elpa.gnu.org/) or the original [ELPA
 repository](http://tromey.com/elpa).
 
-## Running Jelly
+## RUNNING JELLY
 
 Jelly is designed to be easy to get up and running on your own server. It only
 takes five steps:
@@ -17,9 +20,9 @@ takes five steps:
 4. `npm install jelly`
 5. `jelly`
 
-## Installing Packages from a Jelly Archive
+## INSTALLING PACKAGES FROM A JELLY ARCHIVE
 
-### Get `package.el`
+### Get package.el
 
 To use Jelly, you first need `package.el`. If you're using Emacs 24 or later,
 you've already got it. Otherwise, download it from

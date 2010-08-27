@@ -1,8 +1,11 @@
-# The Jelly API
+jelly-api(7) -- the jelly HTTP API
+==================================
+
+## SUMMARY
 
 Jelly supports a simple HTTP interface for uploading packages.
 
-## Response Format
+## RESPONSE FORMAT
 
 Jelly can send responses either as JSON objects or Emacs Lisp assoc lists. If
 the user agent sends `application/json` in its `Accept` header, it will be
@@ -32,7 +35,7 @@ The same response as Elisp might look like this:
     )
 
 
-## Authentication
+## AUTHENTICATION
 
 Every user has a randomly-generated 256-bit authentication token. This token and
 the user's username are required for any request that needs authentication. The
@@ -69,7 +72,7 @@ This will have a 400 status if the username was already taken, or the password
 is invalid.
 
 
-## Packages
+## PACKAGES
 
 Currently, the API only supports uploading packages.
 
