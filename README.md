@@ -17,7 +17,7 @@ takes five steps:
 1. Install [node.js](http://nodejs.org/#download).
 2. Install the [Node package manager](http://github.com/isaacs/npm#readme)
 3. `curl http://github.com/nex3/jelly/tarball/master | tar xz`
-4. `npm install jelly`
+4. `npm install ./jelly`
 5. `jelly`
 
 ## INSTALLING PACKAGES FROM A JELLY ARCHIVE
