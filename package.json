@@ -9,7 +9,8 @@
         "nStore": "0.2.1",
         "connect": "0.2.4",
         "express": "1.0.0rc2",
-        "formidable": "0.9.7"
+        "formidable": "0.9.7",
+        "optparse": "1.0.1"
     },
     "directories": { "lib": "./lib" },
     "engines": { "node": "= 0.1.103" },
