@@ -24,4 +24,4 @@ man/%.man: doc/%.md
 	${RONN} -r $^ > $@
 	${RONN} -5 $^ > $(@:man=html)
 
-doc: README.html man/code.html man/jelly.7.man man/jelly-api.7.man
+doc: README.html man/code.html man/jelly.7.man man/jelly.1.man man/jelly-api.7.man
