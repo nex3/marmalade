@@ -1,0 +1,8 @@
+@import "blueprint/typography";
+@import "blueprint/form";
+
+body {@include blueprint-typography(true)}
+form {@include blueprint-form}
+
+input[type=search] {@extend [type=text]}
+

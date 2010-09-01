@@ -1,3 +1,16 @@
-h1 Jelly
-h2 Spreadable Elisp
-= body
+!!! 5
+html(lang="en")
+  head
+    title Jelly: Spreadable Elisp
+    link(rel="stylesheet", type="text/css", href="/stylesheets/screen.css")
+  body
+    header
+      hgroup
+        h1 Jelly
+        h2 Spreadable Elisp
+      nav
+        a(href="/login") Sign In
+        form(accept-charset="utf-8", action="/search", method="get")
+          input(type="search")
+    #main
+      = body
