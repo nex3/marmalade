@@ -1,5 +1,7 @@
 @import "blueprint/fancy-type";
 @import "compass/css3/inline-block";
+@import "compass/css3/box-sizing";
+@import "fancy-buttons";
 
 $start-columns: floor($blueprint-grid-columns/2);
 #start {
@@ -15,5 +17,28 @@ $start-columns: floor($blueprint-grid-columns/2);
     @include inline-block;
     font-size: 80%;
     letter-spacing: -1px;
+  }
+}
+
+#packages {
+  @include column($blueprint-grid-columns - $start-columns, true);
+  .add {
+    @include fancy-button;
+    @include fancy-button-colors($marmalade);
+    @include box-sizing(border-box);
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    letter-spacing: 1px;
+    position: relative;
+    &:before {
+      content: "+";
+      position: absolute;
+      font-size: 1.4em;
+      left: 3em;
+    }
+    &:active:before {
+      margin-left: -1px;
+    }
   }
 }
