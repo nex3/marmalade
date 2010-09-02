@@ -31,10 +31,9 @@ body {
       }
       a {
         @include fancy-button;
-        @include fancy-button-colors($marmalade);
+        @include fancy-button-colors(desaturate($marmalade, 30%));
 
         text-align: center;
-        font-size: 2em;
         line-height: 20px;
       }
       input {
