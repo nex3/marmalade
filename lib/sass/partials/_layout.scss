@@ -1,5 +1,6 @@
 @import "compass/css3/border-radius";
 @import "compass/css3/text-shadow";
+@import "compass/css3/box-sizing";
 @import "fancy-buttons";
 
 body {
@@ -25,21 +26,21 @@ body {
     nav {
       @include column($nav-width, true);
       margin-top: 1.5em;
+      a, input {
+        @include box-sizing(border-box);
+        width: 100% !important;
+      }
       a {
         @include fancy-button;
         @include fancy-button-colors($marmalade);
 
         display: block;
-        width: 100%;
         text-align: center;
         font-size: 2em;
-        padding: 5px;
-        &:active {padding: 4px}
         line-height: 20px;
       }
       input {
         @include border-radius(5px);
-        width: 100% !important;
         line-height: 20px;
       }
     }
