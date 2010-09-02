@@ -1,0 +1,19 @@
+@import "blueprint/fancy-type";
+@import "compass/css3/inline-block";
+
+$start-columns: floor($blueprint-grid-columns/2);
+#start {
+  @include column($start-columns);
+  font-size: 120%;
+  .intro {
+    font-variant: small-caps;
+    letter-spacing: 1px;
+    font-weight: bold;
+    font-size: 120%;
+  }
+  .elisp {
+    @include inline-block;
+    font-size: 80%;
+    letter-spacing: -1px;
+  }
+}
