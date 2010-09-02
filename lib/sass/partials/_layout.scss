@@ -8,14 +8,14 @@ body {
   header {
     @include column($blueprint-grid-columns);
     $nav-width: floor($blueprint-grid-columns / 4);
+    margin-top: 2%;
     hgroup {
       @include column($blueprint-grid-columns - $nav-width);
-      margin-top: 1.5em;
       h1, h2 {margin-bottom: 0}
       h1 {
           @include column(4);
           @include text-shadow($default-text-shadow-color, 2px, 2px, 2px);
-          font-size: 5.5em;
+          font-size: 5.7em;
           font-weight: bold;
       }
       h2 {
@@ -25,7 +25,6 @@ body {
 
     nav {
       @include column($nav-width, true);
-      margin-top: 1.5em;
       a, input {
         @include box-sizing(border-box);
         width: 100% !important;
