@@ -1,16 +1,16 @@
-jelly-api(7) -- the jelly HTTP API
-==================================
+marmalade-api(7) -- the marmalade HTTP API
+==========================================
 
 ## SUMMARY
 
-Jelly supports a simple HTTP interface for uploading packages.
+Marmalade supports a simple HTTP interface for uploading packages.
 
 ## RESPONSE FORMAT
 
-Jelly can send responses either as JSON objects or Emacs Lisp assoc lists. If
-the user agent sends `application/json` in its `Accept` header, it will be
+Marmalade can send responses either as JSON objects or Emacs Lisp assoc lists.
+If the user agent sends `application/json` in its `Accept` header, it will be
 served JSON. If it sends `text/x-script.elisp`, it will be served Elisp.
-Otherwise, if nothing is specified, Jelly will default to JSON.
+Otherwise, if nothing is specified, Marmalade will default to JSON.
 
 All responses, including error responses, will have a `message` key. The value
 of this key will be a human-readable description of the server event (or the

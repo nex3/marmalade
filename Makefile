@@ -1,4 +1,4 @@
-TITLE="Jelly Documentation"
+TITLE="Marmalade Documentation"
 
 default: doc
 
@@ -16,7 +16,7 @@ man/code.html: ${CODE}
 	mkdir -p html
 	dox --title ${TITLE} $^ > $@
 
-README.html: man/jelly.7
+README.html: man/marmalade.7
 	ln -sf $^ $@
 
 man/%: doc/%.md
@@ -24,4 +24,4 @@ man/%: doc/%.md
 	${RONN} -r $^ > $@
 	${RONN} -5 $^ > $@.html
 
-doc: README.html man/code.html man/jelly.7 man/jelly.1 man/api.7
+doc: README.html man/code.html man/marmalade.7 man/marmalade.1 man/api.7

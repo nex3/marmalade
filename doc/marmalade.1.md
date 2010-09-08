@@ -1,9 +1,9 @@
-jelly(1) -- spreadable elisp server
-===================================
+marmalade(1) -- spreadable elisp server
+=======================================
 
 ## SYNOPSIS
 
-`jelly` [<OPTIONS>]
+`marmalade` [<OPTIONS>]
 
 ## SUMMARY
 
@@ -17,14 +17,14 @@ An Emacs Lisp package server.
   Print a usage message, then exit.
 
 * `-V`, `--version`:
-  Print the Jelly version, then exit.
+  Print the Marmalade version, then exit.
 
 ### Server Configuration
 
 * `-p` <PORT>, `--port` <PORT>:
-  Sets the port on which Jelly will run (default 3000).
+  Sets the port on which Marmalade will run (default 3000).
 
 ### Backend Configuration
 
 * `-d` <DIR>, `--data` <DIR>:
-  Sets the directory in which Jelly will store its data (default ./data).
+  Sets the directory in which Marmalade will store its data (default ./data).

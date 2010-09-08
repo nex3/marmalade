@@ -1,5 +1,5 @@
 {
-    "name": "jelly",
+    "name": "marmalade",
     "description": "An Emacs Lisp package server.",
     "version": "0.0.0",
     "author": "Nathan Weizenbaum <nweiz@google.com>",
@@ -15,6 +15,6 @@
     },
     "directories": { "lib": "./lib" },
     "engines": { "node": "= 0.1.103" },
-    "bin": { "jelly": "./bin/jelly.js" },
-    "man": [ "./man/jelly.7", "./man/jelly.1", "./man/api.7" ]
+    "bin": { "marmalade": "./bin/marmalade.js" },
+    "man": [ "./man/marmalade.7", "./man/marmalade.1", "./man/api.7" ]
 }

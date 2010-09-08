@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 var optparse = require('optparse'),
-    server = require('jelly/server');
+    server = require('marmalade/server');
 
 var parser = new optparse.OptionParser([
     ['-h', '--help', 'Show this help message'],
-    ['-V', '--version', 'Show the Jelly version'],
+    ['-V', '--version', 'Show the Marmalade version'],
     ['-p', '--port PORT', 'Port to run the server on (default 3000)'],
     ['-d', '--data DIR', 'Directory in which to store the server data ' +
                          '(default ./data)']
@@ -14,7 +14,7 @@ var parser = new optparse.OptionParser([
 var port = 3000,
     dataDir = './data';
 
-parser.banner = "Usage: jelly [OPTION]...\n" +
+parser.banner = "Usage: marmalade [OPTION]...\n" +
       "\n" +
       "An Emacs Lisp package server.";
 
@@ -24,7 +24,7 @@ parser.on('help', function() {
 });
 
 parser.on('version', function() {
-    console.log('Jelly 0.0.0');
+    console.log('Marmalade 0.0.0');
     process.exit();
 });
 
