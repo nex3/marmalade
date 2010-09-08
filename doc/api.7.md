@@ -60,13 +60,15 @@ This will have a 400 status if the username or password is wrong.
 
 ### POST /v1/users
 
-*Parameters*: `name`, `password`
+*Parameters*: `name`, `email`, `password`
 
 *Response*: `name`, `token`
 
 *Error Codes*: 400
 
 Registers a new user, and returns the authentication token for that user.
+
+The email is only ever used for resetting lost passwords.
 
 This will have a 400 status if the username was already taken, or the password
 is invalid.
