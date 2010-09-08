@@ -11,7 +11,8 @@
         "express": "1.0.0rc2",
         "formidable": "0.9.7",
         "optparse": "1.0.1",
-        "jade": "0.4.0"
+        "jade": "0.4.0",
+        "email": "0.1.0"
     },
     "directories": { "lib": "./lib" },
     "engines": { "node": "= 0.1.103" },

@@ -46,9 +46,9 @@ authentication fails.
 
 ### POST /v1/users/login
 
-*Parameters*: `name`, `password`.
+*Parameters*: `name`, `password`
 
-*Response*: `name`, `token`.
+*Response*: `name`, `token`
 
 *Error Codes*: 400
 
@@ -57,6 +57,18 @@ password authentication. The token can also be obtained from the web interface
 (TODO: actually it can't yet).
 
 This will have a 400 status if the username or password is wrong.
+
+### POST /v1/users/reset
+
+*Parameters*: `name`
+
+*Error Codes*: 400
+
+Resets a user's password. This generates a new, random password for the
+user and sends that password to the email the user provided during
+registration.
+
+This will have a 400 status if the username isn't registered.
 
 ### POST /v1/users
 
