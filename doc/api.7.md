@@ -84,6 +84,8 @@ Packages are represented as objects with the following fields:
 * `commentary`: An optional longer description of the package, taken from
     the Commentary section for Elisp packages and the README file for
     tarballs.
+* `headers`: A map from (lower-case) header names to their values. Contains all
+    the headers in the package, completely unprocessed.
 * `requires`: An array of name/version pairs describing the dependencies of
     the package. The format for the versions is the same as the `version`
     field.
