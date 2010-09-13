@@ -85,6 +85,16 @@ The email is only ever used for resetting lost passwords.
 This will have a 400 status if the username was already taken, or the password
 is invalid.
 
+### PUT /v1/users
+
+*Parameters*: `name`, `token`, `email`, `password`
+
+*Error Codes*: 400
+
+Updates a user's information. The `token` parameter is used for authentication.
+Both the `password` parameter and the `email` parameter are optional. If either
+is given, it overwrites the current value for that attribute.
+
 
 ## PACKAGES
 
