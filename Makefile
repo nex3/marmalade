@@ -17,7 +17,7 @@ man/code.html: ${CODE}
 	dox --title ${TITLE} $^ > $@
 
 README.html: man/marmalade.7
-	ln -sf $^ $@
+	ln -sf $^.html $@
 
 man/%: doc/%.md
 	mkdir -p man
