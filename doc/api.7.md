@@ -124,10 +124,11 @@ For example, the package for `sass-mode` version 3.0.13 might look like:
       name: "sass-mode",
       description: "Major mode for editing Sass files",
       commentary: "Blah blah blah",
+      headers: {author: "Nathan Weizenbaum", ...},
       requires: [["haml-mode", [3, 0, 13]]],
       version: [3, 0, 13],
       type: "single",
-      owners: {"nex3": true}
+      owners: {nex3: true}
     }
 
 
