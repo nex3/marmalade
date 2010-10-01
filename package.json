@@ -6,7 +6,7 @@
     "dependencies": {
         "step": "0.0.3",
         "underscore": "1.0.4",
-        "nStore": "0.2.1",
+        "mongodb": "0.7.9",
         "connect": "0.2.4",
         "express": "1.0.0rc2",
         "formidable": "0.9.7",
