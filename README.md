@@ -12,13 +12,14 @@ repository](http://tromey.com/elpa).
 ## RUNNING MARMALADE
 
 Marmalade is designed to be easy to get up and running on your own server. It only
-takes five steps:
+takes six steps:
 
 1. Install [node.js](http://nodejs.org/#download).
-2. Install the [Node package manager](http://github.com/isaacs/npm#readme)
-3. `curl http://github.com/nex3/marmalade/tarball/master | tar xz`
-4. `npm install ./marmalade`
-5. `marmalade`
+2. Install the [Node package manager](http://github.com/isaacs/npm#readme).
+3. Install [MongoDB](http://www.mongodb.org/downloads).
+4. `hg clone https://marmalade.googlecode.com/hg/ marmalade`
+5. `npm install ./marmalade`
+6. `marmalade`
 
 ## INSTALLING PACKAGES FROM A MARMALADE ARCHIVE
 
