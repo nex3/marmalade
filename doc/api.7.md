@@ -103,6 +103,16 @@ Currently, the API only supports uploading packages.
 Packages are represented as objects with the following fields:
 
 * `name`: The string name of the package.
+* `owners`: A list of names of users who have the right to post updates for
+    the package.
+* `created`: The date and time the package was created, as a timestamp integer.
+* `versions`: A list of version objects containing data about an individual
+    package version. These are ordered reverse-chronologically, meaning that the
+    first version is the current one.
+
+In turn, version objects have the following fields:
+
+* `name`: The same as the package name.
 * `description`: A single-line description of the package, taken from the
     header line for Elisp packages.
 * `commentary`: An optional longer description of the package, taken from
@@ -115,20 +125,30 @@ Packages are represented as objects with the following fields:
     field.
 * `version`: An array of numbers representing the dot-separated version.
 * `type`: Either "single" (for an Elisp file) or "tar" (for a tarball).
-* `owners`: A set of names of users who have the right to post updates for
-    the package.
 
-For example, the package for `sass-mode` version 3.0.13 might look like:
+For example, the package for `sass-mode` might look like:
 
     {
       name: "sass-mode",
-      description: "Major mode for editing Sass files",
-      commentary: "Blah blah blah",
-      headers: {author: "Nathan Weizenbaum", ...},
-      requires: [["haml-mode", [3, 0, 13]]],
-      version: [3, 0, 13],
-      type: "single",
-      owners: {nex3: true}
+      owners: ["nex3"],
+      created: 1287015817229,
+      versions: [{
+        name: "sass-mode",
+        description: "Major mode for editing Sass files",
+        commentary: "Blah blah blah",
+        headers: {author: "Nathan Weizenbaum", ...},
+        requires: [["haml-mode", [3, 0, 13]]],
+        version: [3, 0, 13],
+        type: "single",
+      }, {
+        name: "sass-mode",
+        description: "Major mode for editing Sass files",
+        commentary: "Blah blah blah",
+        headers: {author: "Nathan Weizenbaum", ...},
+        requires: [["haml-mode", [3, 0, 12]]],
+        version: [3, 0, 12],
+        type: "single",
+      }]
     }
 
 
@@ -149,7 +169,8 @@ files. In either case, it must conform to the [ELPA packaging
 standards](http://tromey.com/elpa/upload.html).
 
 This returns the package object that has been parsed out of the uploaded
-package.
+package. This will only include the version just uploaded, not any other
+versions that were uploaded before.
 
 The response will have a 400 status if the package is improperly formatted.
 
