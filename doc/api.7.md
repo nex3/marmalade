@@ -140,6 +140,7 @@ For example, the package for `sass-mode` might look like:
         requires: [["haml-mode", [3, 0, 13]]],
         version: [3, 0, 13],
         type: "single",
+        created: 1287693178133,
       }, {
         name: "sass-mode",
         description: "Major mode for editing Sass files",
@@ -148,6 +149,7 @@ For example, the package for `sass-mode` might look like:
         requires: [["haml-mode", [3, 0, 12]]],
         version: [3, 0, 12],
         type: "single",
+        created: 1287015817229,
       }]
     }
 
