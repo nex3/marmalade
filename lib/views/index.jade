@@ -35,11 +35,11 @@
   a.add(href="/packages/new") Add Package
   table
     tr
-      th Name
-      th Version
-      th Author
+      th.name Name
+      th.version Version
+      th.author Author
     - each package in packages
       tr
-        td= package.name
-        td= package.version.join('.')
-        td= package.headers['author']
+        td.name= package.name
+        td.version= package.version.join('.')
+        td.author= package.headers['author']

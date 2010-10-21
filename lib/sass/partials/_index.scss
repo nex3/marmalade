@@ -58,4 +58,13 @@ $start-columns: floor($blueprint-grid-columns/2);
       margin-left: -1px;
     }
   }
+
+  table {
+    font-size: 110%;
+    .name {width: 35%}
+    .author {
+      width: 50%;
+      text-align: right;
+    }
+  }
 }
