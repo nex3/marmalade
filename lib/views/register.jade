@@ -1,0 +1,27 @@
+// Marmalade: an Emacs Lisp package server.
+// Copyright (C) 2010 Google Inc.
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+form(accept-charset="utf-8", class="signup", method="post")
+  label(for="username") Username
+  input(name="username", id="username", type="text")
+  label(for="email") Email
+  input(name="email", id="email", type="email")
+  label(for="password") Password
+  input(name="password", id="password", type="password")
+  label(for="password2")
+    | Password <span class="again">(Again)</span>
+  input(name="password2", id="password2", type="password")
+  input(type="submit", value="Sign Up")

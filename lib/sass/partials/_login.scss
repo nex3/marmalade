@@ -26,15 +26,22 @@ form.login, form.signup {
 
   $label-width: 3;
   $height: 30px;
-  label, input[type="text"], input[type="password"] {
+  label, input:not([type="submit"]) {
     margin: {top: 10px; bottom: 10px}
     font-size: 18px;
   }
   label {
     @include column($label-width);
     line-height: $height;
+    position: relative;
+    .again {
+      font-size: 12px;
+      position: absolute;
+      left: 20px;
+      bottom: -15px;
+    }
   }
-  input[type="text"], input[type="password"] {
+  input:not([type="submit"]) {
     @include box-sizing(border-box);
     @include column($form-width - $label-width, true);
     height: $height;
