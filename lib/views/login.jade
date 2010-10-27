@@ -14,20 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-!!! 5
-html(lang="en")
-  head
-    title Marmalade: Spreadable Elisp
-    link(rel="stylesheet", type="text/css", href="/stylesheets/screen.css")
-  body
-    header
-      hgroup
-        h1 Marmalade
-        h2 Spreadable Elisp
-      nav
-        a(href="/login") Sign In
-        a(href="/register") Sign Up
-        form(accept-charset="utf-8", action="/search", method="get")
-          input(type="search")
-    #main
-      != body
+form(accept-charset="utf-8", class="login", method="post")
+  label(for="username") Username
+  input(name="username", id="username", type="text")
+  label(for="password") Password
+  input(name="password", id="password", type="password")
+  input(type="submit", value="Sign In")

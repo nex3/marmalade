@@ -1,0 +1,47 @@
+/* Marmalade: an Emacs Lisp package server.
+ * Copyright (C) 2010 Google Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "compass/css3/box-sizing";
+
+form.login, form.signup {
+  $padding: $blueprint-grid-columns/4;
+  $form-width: $blueprint-grid-columns - $padding*2;
+  @include column($form-width);
+  @include prepend($padding);
+  @include append($padding);
+
+  $label-width: 3;
+  $height: 30px;
+  label, input[type="text"], input[type="password"] {
+    margin: {top: 10px; bottom: 10px}
+    font-size: 18px;
+  }
+  label {
+    @include column($label-width);
+    line-height: $height;
+  }
+  input[type="text"], input[type="password"] {
+    @include box-sizing(border-box);
+    @include column($form-width - $label-width, true);
+    height: $height;
+  }
+  input[type="submit"] {
+    @include column($form-width, true);
+    @extend .signin;
+    margin-top: 10px;
+  }
+}

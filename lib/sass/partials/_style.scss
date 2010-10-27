@@ -16,8 +16,17 @@
  */
 
 @import "compass/css3/border-radius";
+@import "fancy-buttons";
 
 .elisp {
   background-color: mix(white, blue, 93%);
   @include border-radius(4px);
+}
+
+.signin {
+  @include fancy-button;
+  @include fancy-button-colors(desaturate($marmalade, 30%));
+
+  text-align: center;
+  line-height: 20px;
 }

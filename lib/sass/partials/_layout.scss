@@ -44,18 +44,19 @@ body {
       @include column($nav-width, true);
       a, input {
         @include box-sizing(border-box);
-        width: 100% !important;
       }
       a {
-        @include fancy-button;
-        @include fancy-button-colors(desaturate($marmalade, 30%));
-
-        text-align: center;
-        line-height: 20px;
+        @extend .signin;
+        width: 48% !important;
+        margin: {
+          left: 1%;
+          right: 1%;
+        }
       }
       input {
         @include border-radius(5px);
         line-height: 20px;
+        width: 100% !important;
       }
     }
   }
