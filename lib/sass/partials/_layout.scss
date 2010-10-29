@@ -18,6 +18,7 @@
 @import "compass/css3/border-radius";
 @import "compass/css3/text-shadow";
 @import "compass/css3/box-sizing";
+@import "compass/css3/inline-block";
 @import "fancy-buttons";
 
 body {
@@ -42,18 +43,33 @@ body {
 
     nav {
       @include column($nav-width, true);
-      a, input {
+      a, input, .signed-in {
         @include box-sizing(border-box);
       }
-      a {
-        @extend .signin;
+      form {display: inline}
+      a, input[type="submit"] {@extend .signin}
+      a, input[type="submit"], .signed-in {
         width: 48% !important;
         margin: {
           left: 1%;
           right: 1%;
         }
       }
-      input {
+      .signed-in {
+        @include inline-block;
+        text-align: center;
+        font-size: 110%;
+        line-height: 0.9;
+        position: relative;
+        top: -5px;
+        .name {
+          display: block;
+          font-weight: bold;
+          position: relative;
+          top: 4px;
+        }
+      }
+      input[type="search"] {
         @include border-radius(5px);
         line-height: 20px;
         width: 100% !important;

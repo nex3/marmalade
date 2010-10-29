@@ -25,8 +25,13 @@ html(lang="en")
         h1 Marmalade
         h2 Spreadable Elisp
       nav
-        a(href="/login") Sign In
-        a(href="/register") Sign Up
+        - if (username)
+          .signed-in Signed in as <span class="name">#{username}</span>
+          form(accept-charset="utf-8", action="/logout", method="post")
+            input(type="submit", value="Sign Out")
+        - else
+          a(href="/login") Sign In
+          a(href="/register") Sign Up
         form(accept-charset="utf-8", action="/search", method="get")
           input(type="search")
     #main
