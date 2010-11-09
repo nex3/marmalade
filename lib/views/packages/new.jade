@@ -1,5 +1,6 @@
 form(accept-charset="utf-8", method="post", enctype="multipart/form-data")
   label(for="package")
-    | Package (<code>.el</code> or <code>.tar</code>)
+    | Package File
+    span.annotation (<code>.el</code> or <code>.tar</code>)
   input(type="file", name="package")
   input(type="submit", value="Upload")
