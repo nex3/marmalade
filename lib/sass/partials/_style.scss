@@ -16,6 +16,7 @@
  */
 
 @import "compass/css3/border-radius";
+@import "compass/css3/box-sizing";
 @import "fancy-buttons";
 
 .elisp {
@@ -38,4 +39,24 @@ code.line {
 
   text-align: center;
   line-height: 20px;
+}
+
+.message {
+  font-size: 20px;
+  @include border-radius(6px);
+  text-align: center;
+  @include push(floor($blueprint-grid-columns/6));
+  @include column(ceil($blueprint-grid-columns*2/3), true);
+  @include box-sizing(border-box);
+  padding: 5px;
+
+  a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+}
+
+.error {
+  @extend .message;
+  background-color: lighten($marmalade, 20%);
 }

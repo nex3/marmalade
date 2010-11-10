@@ -14,6 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+- if (loginRequired)
+  .error
+    | You must be logged in to view this page.
+    | If you don't have an account,
+    | <a href="/register">sign up here</a>.
+
 form(accept-charset="utf-8", class="login", method="post")
   label(for="name") Username
   input(name="name", id="username", type="text")
