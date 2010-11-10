@@ -23,5 +23,8 @@ form {@include blueprint-form}
 
 input[type=search] {@extend [type=text]}
 
-#main h2 {text-align: center}
+#main h2 {
+  text-align: center;
+  @include column($blueprint-grid-columns, true);
+}
 
