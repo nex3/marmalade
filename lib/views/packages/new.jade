@@ -4,3 +4,65 @@ form(accept-charset="utf-8", method="post", enctype="multipart/form-data")
     span.annotation (<code>.el</code> or <code>.tar</code>)
   input(type="file", name="package")
   input(type="submit", value="Upload")
+
+h2 Packages can be in one of two formats:
+
+.filetype#el
+  h3 A single <code>.el</code> file
+  p
+    | The <code>.el</code> file <strong>must</strong> begin with:
+    code.elisp.line ;;; <span class="variable">name</span>.el --- <span class="variable">description</span>
+    | It must also end with:
+    code.elisp.line ;;; <span class="variable">name</span>.el ends here
+
+  p
+    | Further metadata is provided in the headers, which must be of the form:
+    code.elisp.line ;; <span class="variable">Header</span>: <span class="variable">value</span>
+    | The file must contain a "<code>Version</code>" header
+    | containing the package version, numbers separated by periods.
+    | It may optionally include a "<code>Package-Requires</code>" header
+    | containing a list of package/version pairs that this package depends on.
+
+  p For example:
+  pre.elisp
+    :preserve
+      | ;;; sass-mode.el --- Sass major mode
+      | 
+      | ;; Copyright 2007-2010 Nathan Weizenbaum
+      | 
+      | ;; Author: Nathan Weizenbaum
+      | ;; URL: http://github.com/nex3/sass-mode
+      | ;; Version: 3.0.20
+      | ;; Package-Requires: ((haml-mode "3.0.20"))
+      | 
+      | ;; Code goes here
+      | 
+      | ;;; sass-mode.el ends here
+
+.filetype#tar
+  h3 A <code>.tar</code> file containing many other files
+  p
+    | The <code>.tar</code> file <strong>must</strong> contain a file
+    | named "<code><span class="variable">name</span>-pkg.el</code>".
+  p
+    | This file must have a single call
+    | to the <code class="elisp">`define-package'</code> function,
+    | with these parameters:
+  ul
+    li <code class="elisp">`name'</code>: The case-insensitive package name.
+    li
+      | <code class="elisp">`version'</code>: The package version,
+      | numbers separated by periods.
+    li
+      | <code class="elisp">`description'</code> (optional):
+      | A short description of the package.
+    li
+      | <code class="elisp">`requirements'</code> (optional):
+      | A quoted list of package/version pairs that this package depends on.
+  p For example:
+  pre.elisp
+    :preserve
+      | (define-package "sass-mode" "3.0.20"
+      |                 "Sass major mode"
+      |                 '((haml-mode "3.0.20")))
+    

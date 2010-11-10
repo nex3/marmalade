@@ -81,5 +81,6 @@ body {
   #main {
     @include column($blueprint-grid-columns);
     margin-top: 1.5em;
+    padding-bottom: 2em;
   }
 }

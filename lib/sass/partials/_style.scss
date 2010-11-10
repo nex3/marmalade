@@ -23,6 +23,15 @@
   @include border-radius(4px);
 }
 
+code.line {
+  display: block;
+  margin-left: 20px;
+}
+
+.variable {
+  font-style: italic;
+}
+
 .signin {
   @include fancy-button;
   @include fancy-button-colors(desaturate($marmalade, 30%));
