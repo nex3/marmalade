@@ -23,6 +23,7 @@
 
 body {
   @include container;
+  overflow: auto;
   header {
     @include column($blueprint-grid-columns);
     $nav-width: floor($blueprint-grid-columns / 4);
