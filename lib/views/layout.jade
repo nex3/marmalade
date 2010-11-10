@@ -22,8 +22,9 @@ html(lang="en")
   body
     header
       hgroup
-        h1 Marmalade
-        h2 Spreadable Elisp
+        a(href="/")
+          h1 Marmalade
+          h2 Spreadable Elisp
       nav
         - if (username)
           .signed-in Signed in as <span class="name">#{username}</span>
