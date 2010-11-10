@@ -17,6 +17,7 @@
 
 @import "compass/css3/border-radius";
 @import "compass/css3/box-sizing";
+@import "compass/utilities/links/link-colors";
 @import "fancy-buttons";
 
 .elisp {
@@ -56,7 +57,26 @@ code.line {
   }
 }
 
+@mixin link-theme($base-color) {
+  a {
+    @include link-colors(
+      $base-color,
+      darken($base-color, 10%),
+      lighten($base-color, 10%),
+      darken($base-color, 5%),
+      darken($base-color, 10%));
+  }
+}
+
 .error {
   @extend .message;
-  background-color: lighten($marmalade, 20%);
+  background-color: darken(mix(red, $marmalade, 25%), 10%);
+  color: white;
+  @include link-theme(lighten($marmalade, 30%));
+}
+
+.info {
+  @extend .message;
+  background-color: lighten($marmalade, 25%);
+  @include link-theme(darken($marmalade, 10%));
 }

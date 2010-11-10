@@ -36,4 +36,7 @@ html(lang="en")
         form(accept-charset="utf-8", action="/search", method="get")
           input(type="search")
     #main
+      - each message, name in flash
+        div(class=name)!= message
+
       != body
