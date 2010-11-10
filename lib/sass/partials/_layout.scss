@@ -74,6 +74,13 @@ body {
         @include border-radius(5px);
         line-height: 20px;
         width: 100% !important;
+        padding-left: 25px;
+
+        background: {
+          image: url(/images/search.png);
+          repeat: no-repeat;
+          position: 5px center;
+        }
       }
     }
   }
