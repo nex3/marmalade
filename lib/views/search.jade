@@ -23,3 +23,13 @@ ol#packageSearch
         .name= package.name
         .version= package._latestVersion.version.join('.')
         .description= package._latestVersion.description
+
+- if (page != 0)
+  a.prev(href="/search?q=" + h(query) + "&page=" + h(page - 1)) Previous
+- else
+  a.prev.dead Previous
+
+- if (hasNextPage)
+  a.next(href="/search?q=" + h(query) + "&page=" + h(page + 1)) Next
+- else
+  a.next.dead Next

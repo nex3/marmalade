@@ -17,11 +17,12 @@
 
 @import "compass/utilities/lists/bullets";
 @import "compass/utilities/links/link-colors";
+@import "compass/utilities/text/replacement";
 
 ol#packageSearch {
   @include no-bullets;
   @include push($blueprint-grid-columns/6);
-  @include column($blueprint-grid-columns*2/3);
+  @include column($blueprint-grid-columns*2/3, true);
   padding: 0;
 
   a {
@@ -59,3 +60,13 @@ ol#packageSearch {
     color: black !important;
   }
 }
+
+.prev {@include push($blueprint-grid-columns/4)}
+
+.prev, .next {
+    @include column($blueprint-grid-columns/4);
+    font-size: 16px;
+    text-align: center;
+    &.dead {@include hide-text}
+}
+.next {@include last}
