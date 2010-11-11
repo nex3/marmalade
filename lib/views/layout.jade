@@ -34,7 +34,7 @@ html(lang="en")
           a(href="/login") Sign In
           a(href="/register") Sign Up
         form(accept-charset="utf-8", action="/search", method="get")
-          input(type="search")
+          input(type="search", name="q")
     #main
       - each message, name in flash
         div(class=name)!= message
