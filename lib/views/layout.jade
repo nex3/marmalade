@@ -33,7 +33,7 @@ html(lang="en")
         - else
           a(href="/login") Sign In
           a(href="/register") Sign Up
-        form(accept-charset="utf-8", action="/packages/search", method="get")
+        form(accept-charset="utf-8", action="/packages", method="get")
           input(type="search", name="q")
     #main
       - each message, name in flash

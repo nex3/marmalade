@@ -15,8 +15,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 - if (packages.length > 0)
-  h2 Packages matching "#{h(query)}"
+  - if (query)
+    h2 Packages matching "#{h(query)}"
+  - else
+    h2 All packages
 
-  != partial('packages/_list', {locals: {packages: packages, page: page, hasNextPage: hasNextPage}})
-- else
+  ol#packages
+    - each package in packages
+      li
+        a(href="/packages/" + h(package._name))
+          .name= package.name
+          .version= package._latestVersion.version.join('.')
+          .description= package._latestVersion.description
+
+  - if (page != 0)
+    a.prev(href=h(pagePath(page - 1))) Previous
+  - else
+    a.prev.dead Previous
+
+  - if (hasNextPage)
+    a.next(href=h(pagePath(page + 1))) Next
+  - else
+    a.next.dead Next
+
+- else if (query)
   h2 No packages match "#{h(query)}"
+- else
+  h2 No packages
