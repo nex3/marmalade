@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-h2 Packages matching "#{h(query)}"
+- if (packages.length > 0)
+  h2 Packages matching "#{h(query)}"
 
-!= partial('packages/_list', {locals: {packages: packages, page: page, hasNextPage: hasNextPage}})
+  != partial('packages/_list', {locals: {packages: packages, page: page, hasNextPage: hasNextPage}})
+- else
+  h2 No packages match "#{h(query)}"
