@@ -26,21 +26,15 @@ ol#packages {
   padding: 0;
 
   a {
-    @include link-colors(
-      black,
-      black,
-      lighten(black, 50%),
-      lighten(black, 15%),
-      lighten(black, 30%));
+    @extend .package-link;
     display: block;
     padding: {top: 10px; bottom: 10px}
-    text-decoration: none;
   }
 
   li {
     border-top: 1px solid desaturate(lighten($marmalade, 30%), 70%);
     &:first-child {border-top: none}
-    &:hover {background-color: saturate(lighten($marmalade, 50%), 10%)}
+    &:hover {background-color: $marmalade-hover}
   }
 
   .name, .version {

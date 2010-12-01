@@ -66,6 +66,14 @@ $start-columns: floor($blueprint-grid-columns/2);
       width: 50%;
       text-align: right;
     }
+    a {
+      @extend .package-link;
+      display: block;
+    }
+    tr:hover {
+      background-color: $marmalade-hover;
+      a {font-weight: bold}
+    }
     margin-bottom: 0;
   }
 

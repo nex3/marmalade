@@ -80,3 +80,13 @@ code.line {
   background-color: lighten($marmalade, 25%);
   @include link-theme(darken($marmalade, 10%));
 }
+
+.package-link {
+  @include link-colors(
+    black,
+    lighten(black, 30%),
+    lighten(black, 50%),
+    lighten(black, 15%),
+    lighten(black, 40%));
+  text-decoration: none;
+}
