@@ -14,6 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-h2 Packages matching "#{h(query)}"
+ol#packages
+  - each package in packages
+    li
+      a(href="/packages/" + h(package._name))
+        .name= package.name
+        .version= package._latestVersion.version.join('.')
+        .description= package._latestVersion.description
 
-!= partial('packages/_list', {locals: {packages: packages, page: page, hasNextPage: hasNextPage}})
+- if (page != 0)
+  a.prev(href=h(pagePath(page - 1))) Previous
+- else
+  a.prev.dead Previous
+
+- if (hasNextPage)
+  a.next(href=h(pagePath(page + 1))) Next
+- else
+  a.next.dead Next
+

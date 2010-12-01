@@ -19,7 +19,7 @@
 @import "compass/utilities/links/link-colors";
 @import "compass/utilities/text/replacement";
 
-ol#packageSearch {
+ol#packages {
   @include no-bullets;
   @include push($blueprint-grid-columns/6);
   @include column($blueprint-grid-columns*2/3, true);

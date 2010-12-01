@@ -66,5 +66,12 @@ $start-columns: floor($blueprint-grid-columns/2);
       width: 50%;
       text-align: right;
     }
+    margin-bottom: 0;
+  }
+
+  .all {
+    display: block;
+    padding-left: 4px;
+    font-size: 120%;
   }
 }
