@@ -30,6 +30,7 @@ body {
     margin-top: 2%;
     hgroup {
       @include column($blueprint-grid-columns - $nav-width);
+      a {text-decoration: none}
       h1, h2 {margin-bottom: 0}
       h1 {
           @include column(9);
