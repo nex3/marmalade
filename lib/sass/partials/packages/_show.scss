@@ -44,3 +44,11 @@ h3.description {
     text-align: center;
   }
 }
+
+.commentary {
+  @include column($blueprint-grid-columns - 6);
+  @include prepend(3);
+
+  margin-top: 20px;
+  font-size: 130%;
+}

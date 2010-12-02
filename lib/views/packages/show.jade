@@ -25,3 +25,5 @@ h3.description= version.description
   span.instruction Install:
   pre M-x package-install #{pkg.name}
   a.download(href=h(packageDownloadPath(version))) Download
+
+.commentary!= formatText(version.commentary)
