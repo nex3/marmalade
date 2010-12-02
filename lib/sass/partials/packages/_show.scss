@@ -41,9 +41,17 @@ h3.description {
 
   .author {@include column(4)}
 
-  a {
+  > a {
     @include column(2);
     @include pull(-1);
+  }
+
+  ul {
+    margin: 0;
+    li {
+      padding: 5px 0;
+      @include column(2);
+    }
   }
 }
 
