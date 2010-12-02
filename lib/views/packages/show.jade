@@ -26,7 +26,7 @@ h3.description= version.description
   pre M-x package-install #{pkg.name}
   - if (version.headers['author'])
     .label Author:
-    .author= version.headers['author']
+    .author= authorName(version.headers['author'])
   - if (version.headers['url'])
     a(href=h(version.headers['url'])) Homepage
   a(href=h(packageDownloadPath(version))) Download
