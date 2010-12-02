@@ -15,15 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "blueprint/reset";
-@import "partials/base";
-@import "blueprint";
+h3.description {
+  text-align: center;
+  font-size: 120%;
+}
 
-@import "partials/style";
-@import "partials/page";
-@import "partials/layout";
-@import "partials/index";
-@import "partials/form";
-@import "partials/new";
-@import "partials/search";
-@import "partials/packages/show";
+.install {
+  @include container;
+  font-size: 120%;
+
+  > * {padding: {top: 5px; bottom: 5px}}
+
+  .instruction {
+    @include column(2);
+    font-weight: bold;
+  }
+
+  pre {
+    @include column(8);
+    @extend .elisp;
+    margin: {top: 0; bottom: 0}
+    text-align: center;
+  }
+
+  .download {
+    @include column(3);
+    @include pull(-5);
+    text-align: center;
+  }
+}

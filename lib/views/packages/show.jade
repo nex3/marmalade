@@ -18,3 +18,10 @@ h2
   span.name= pkg.name
   = " "
   span.version= version.version.join('.')
+
+h3.description= version.description
+
+.install
+  span.instruction Install:
+  pre M-x package-install #{pkg.name}
+  a.download(href=h(packageDownloadPath(version))) Download
