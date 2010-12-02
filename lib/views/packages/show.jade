@@ -21,9 +21,14 @@ h2
 
 h3.description= version.description
 
-.install
-  span.instruction Install:
+.metadata
+  .label Install:
   pre M-x package-install #{pkg.name}
-  a.download(href=h(packageDownloadPath(version))) Download
+  - if (version.headers['author'])
+    .label Author:
+    .author= version.headers['author']
+  - if (version.headers['url'])
+    a(href=h(version.headers['url'])) Homepage
+  a(href=h(packageDownloadPath(version))) Download
 
 .commentary!= formatText(version.commentary)

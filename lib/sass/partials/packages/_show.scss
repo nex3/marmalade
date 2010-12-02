@@ -20,15 +20,16 @@ h3.description {
   font-size: 120%;
 }
 
-.install {
+.metadata {
   @include container;
   font-size: 120%;
 
   > * {padding: {top: 5px; bottom: 5px}}
 
-  .instruction {
+  .label {
     @include column(2);
     font-weight: bold;
+    text-align: right;
   }
 
   pre {
@@ -38,10 +39,11 @@ h3.description {
     text-align: center;
   }
 
-  .download {
-    @include column(3);
-    @include pull(-5);
-    text-align: center;
+  .author {@include column(4)}
+
+  a {
+    @include column(2);
+    @include pull(-1);
   }
 }
 
