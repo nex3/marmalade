@@ -24,3 +24,5 @@ man/%: doc/%.md
 	${RONN} -5 $^ > $@.html
 
 doc: README.html man/code.html man/marmalade.7 man/marmalade.1 man/api.7
+	rm -rf lib/public/doc-files
+	cp -r man lib/public/doc-files
