@@ -19,6 +19,7 @@
   h3 {
     text-align: center;
     font-size: 120%;
+    @include column($blueprint-grid-columns, true);
   }
 
   .metadata {
@@ -47,7 +48,7 @@
       @include pull(-1);
     }
 
-    .label.owners {
+    .label.owners, li.add {
       $image-height: 65px;
       $image-padding: 5px*2;
       $height: 21px;
@@ -61,6 +62,9 @@
       li {
         padding: 5px 0;
         @include column(2);
+        &.add {
+          @include column(3);
+        }
       }
     }
   }

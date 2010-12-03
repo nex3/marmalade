@@ -36,6 +36,9 @@ h3.description= version.description
       li
         a(href=h("/profiles/" + owner))
           img(src=gravatar(pkg.owners[owner]), alt=owner)
+    - if (ownsPackage)
+      li.add
+        a(href=currentUrl + '/owners/new') Add Owner
 
 - if (version.commentary)
   .commentary!= formatText(version.commentary)
