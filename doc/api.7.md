@@ -178,7 +178,7 @@ The response will have a 403 status if the username and token are valid, but the
 user in question doesn't have permission to upload the given package.
 
 
-### POST /v1/packages/owners
+### POST /v1/packages/:package/owners
 
 *Parameters*: `name`, `token`, `package`, `owner[0-9]*`
 
