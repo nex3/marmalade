@@ -191,3 +191,24 @@ Adds one or more owners to an existing package.
 
 The response will have a 400 status if any parameters are improperly formatted,
 or if any owner does not exist.
+
+The response will have a 403 status if the username and token are valid, but the
+user in question doesn't have permission to add owners to this package.
+
+
+### DELETE /v1/packages/:package/owners
+
+*Parameters*: `name`, `token`, `package`, `owner[0-9]*`
+
+*Error Codes*: 400, 403
+
+Removes one or more owners from a package.
+
+`package` should be the name of the package. All parameters matching
+`owner[0-9]*` should be names of users to remove as owners.
+
+The response will have a 400 status if any parameters are improperly formatted,
+or if any owner does not exist.
+
+The response will have a 403 status if the username and token are valid, but the
+user in question doesn't have permission to remove owners from this package.
