@@ -9,8 +9,7 @@ clean:
 # because the JS one is pretty bare-bones.
 RONN=ronn --pipe
 
-CODE=lib/backend.js lib/server.js lib/helpers.js lib/packageParser.js	\
-     lib/sexpParser.js lib/sexp.js lib/util.js
+CODE=$(shell find lib/ -name '*.js')
 
 man/code.html: ${CODE}
 	mkdir -p html
