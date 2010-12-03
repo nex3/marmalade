@@ -30,11 +30,12 @@ h3.description= version.description
   - if (version.headers['url'])
     a(href=h(version.headers['url'])) Homepage
   a(href=h(packageDownloadPath(version))) Download
-  .label Owner#{pkg.owners.length == 1 ? "" : "s"}:
+  .label.owners Owner#{_.keys(pkg.owners).length == 1 ? "" : "s"}:
   ul.owners
-    - each owner in pkg.owners
+    - each email, owner in pkg.owners
       li
-        a(href="/profiles/" + owner)= owner
+        a(href=h("/profiles/" + owner))
+          img(src=gravatar(pkg.owners[owner]), alt=owner)
 
 - if (version.commentary)
   .commentary!= formatText(version.commentary)

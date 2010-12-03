@@ -46,6 +46,14 @@ h3.description {
     @include pull(-1);
   }
 
+  .label.owners {
+    $image-height: 65px;
+    $image-padding: 5px*2;
+    $height: 21px;
+    height: $height;
+    padding: ($image-height + $image-padding - $height)/2 inherit;
+  }
+
   ul {
     margin: 0;
     li {
