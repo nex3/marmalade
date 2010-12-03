@@ -18,32 +18,34 @@
 @import "compass/css3/inline-block";
 @import "compass/utilities/general/min";
 
-form {margin-bottom: 2em}
+#main.packages-new {
+  form {margin-bottom: 2em}
 
-.filetype {
-  margin-top: -1em;
+  .filetype {
+    margin-top: -1em;
 
-  $filetype-columns: $blueprint-grid-columns/2 - 2;
-  &#el {
-    @include column($filetype-columns);
-    @include border();
-    @include append(1);
-    @include min-height(500px);
+    $filetype-columns: $blueprint-grid-columns/2 - 2;
+    &#el {
+      @include column($filetype-columns);
+      @include border();
+      @include append(1);
+      @include min-height(500px);
+    }
+    &#tar {
+      @include column($filetype-columns, true);
+      @include prepend(1);
+    }
+
+    font-size: 15px;
+    h3 {
+      text-align: center;
+      font-size: 115%;
+      font-weight: bold;
+      code {font-weight: bold}
+    }
+
+    ul {font-size: 90%}
+    li {margin-bottom: 5px}
+    pre.elisp {margin-top: -1.5em}
   }
-  &#tar {
-    @include column($filetype-columns, true);
-    @include prepend(1);
-  }
-
-  font-size: 15px;
-  h3 {
-    text-align: center;
-    font-size: 115%;
-    font-weight: bold;
-    code {font-weight: bold}
-  }
-
-  ul {font-size: 90%}
-  li {margin-bottom: 5px}
-  pre.elisp {margin-top: -1.5em}
 }

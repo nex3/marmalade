@@ -20,66 +20,68 @@
 @import "compass/css3/box-sizing";
 @import "fancy-buttons";
 
-$start-columns: floor($blueprint-grid-columns/2);
-#start {
-  @include column($start-columns);
-  font-size: 120%;
-  .intro {
-    font-variant: small-caps;
-    letter-spacing: 1px;
-    font-weight: bold;
+#main.index {
+  $start-columns: floor($blueprint-grid-columns/2);
+  #start {
+    @include column($start-columns);
     font-size: 120%;
-  }
-  .elisp {
-    @include inline-block;
-    font-size: 80%;
-    letter-spacing: -1px;
-  }
-}
-
-#packages {
-  @include column($blueprint-grid-columns - $start-columns, true);
-  .add {
-    @include fancy-button;
-    @include fancy-button-colors($marmalade);
-    @include box-sizing(border-box);
-    width: 100%;
-    text-align: center;
-    font-size: 2em;
-    letter-spacing: 1px;
-    position: relative;
-    &:before {
-      content: "+";
-      position: absolute;
-      font-size: 1.4em;
-      left: 3em;
+    .intro {
+      font-variant: small-caps;
+      letter-spacing: 1px;
+      font-weight: bold;
+      font-size: 120%;
     }
-    &:active:before {
-      margin-left: -1px;
+    .elisp {
+      @include inline-block;
+      font-size: 80%;
+      letter-spacing: -1px;
     }
   }
 
-  table {
-    font-size: 110%;
-    .name {width: 35%}
-    .author {
-      width: 50%;
-      text-align: right;
+  #packages {
+    @include column($blueprint-grid-columns - $start-columns, true);
+    .add {
+      @include fancy-button;
+      @include fancy-button-colors($marmalade);
+      @include box-sizing(border-box);
+      width: 100%;
+      text-align: center;
+      font-size: 2em;
+      letter-spacing: 1px;
+      position: relative;
+      &:before {
+        content: "+";
+        position: absolute;
+        font-size: 1.4em;
+        left: 3em;
+      }
+      &:active:before {
+        margin-left: -1px;
+      }
     }
-    a {
-      @extend .package-link;
+
+    table {
+      font-size: 110%;
+      .name {width: 35%}
+      .author {
+        width: 50%;
+        text-align: right;
+      }
+      a {
+        @extend .package-link;
+        display: block;
+      }
+      tr:hover {
+        background-color: $marmalade-hover;
+        a {font-weight: bold}
+      }
+      margin-bottom: 0;
+    }
+
+    .all {
       display: block;
+      padding-left: 4px;
+      font-size: 120%;
     }
-    tr:hover {
-      background-color: $marmalade-hover;
-      a {font-weight: bold}
-    }
-    margin-bottom: 0;
-  }
-
-  .all {
-    display: block;
-    padding-left: 4px;
-    font-size: 120%;
   }
 }
