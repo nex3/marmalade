@@ -98,8 +98,6 @@ is given, it overwrites the current value for that attribute.
 
 ## PACKAGES
 
-Currently, the API only supports uploading packages.
-
 Packages are represented as objects with the following fields:
 
 * `name`: The string name of the package.
@@ -178,3 +176,18 @@ The response will have a 400 status if the package is improperly formatted.
 
 The response will have a 403 status if the username and token are valid, but the
 user in question doesn't have permission to upload the given package.
+
+
+### POST /v1/packages/owners
+
+*Parameters*: `name`, `token`, `package`, `owner[0-9]*`
+
+*Error Codes*: 400, 403
+
+Adds one or more owners to an existing package.
+
+`package` should be the name of the package. All parameters matching
+`owner[0-9]*` should be names of existing users to add as owners.
+
+The response will have a 400 status if any parameters are improperly formatted,
+or if any owner does not exist.
