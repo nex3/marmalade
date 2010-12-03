@@ -1,0 +1,66 @@
+ /* Marmalade: an Emacs Lisp package server.
+ * Copyright (C) 2010 Google Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "compass/utilities/lists/bullets";
+@import "compass/utilities/links/link-colors";
+@import "compass/utilities/text/replacement";
+
+ol#packages {
+  @include no-bullets;
+  @include push($blueprint-grid-columns/6);
+  @include column($blueprint-grid-columns*2/3, true);
+  padding: 0;
+
+  a {
+    @extend .package-link;
+    display: block;
+    padding: {top: 10px; bottom: 10px}
+  }
+
+  li {
+    border-top: 1px solid desaturate(lighten($marmalade, 30%), 70%);
+    &:first-child {border-top: none}
+    &:hover {background-color: $marmalade-hover}
+  }
+
+  .name, .version {
+    float: left;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .version {
+    padding-left: 6px;
+    &:before {content: "("}
+    &:after {content: ")"}
+  }
+
+  .description {
+    clear: both;
+    font-size: 14px;
+    color: black !important;
+  }
+}
+
+.prev {@include push($blueprint-grid-columns/4)}
+
+.prev, .next {
+    @include column($blueprint-grid-columns/4);
+    font-size: 16px;
+    text-align: center;
+    &.dead {@include hide-text}
+}
+.next {@include last}

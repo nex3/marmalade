@@ -14,25 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-- if (packages.length > 0)
-  - if (query)
-    h2 Packages matching "#{h(query)}"
-  - else
-    h2 All packages
+h2= user.name
+.avatar
+  img(src=gravatar(user.email), alt=user.name)
 
-  != partial('packages/list.jade', {locals: {packages: packages}})
-
-  - if (page != 0)
-    a.prev(href=h(pagePath(page - 1))) Previous
-  - else
-    a.prev.dead Previous
-
-  - if (hasNextPage)
-    a.next(href=h(pagePath(page + 1))) Next
-  - else
-    a.next.dead Next
-
-- else if (query)
-  h2 No packages match "#{h(query)}"
-- else
-  h2 No packages
+!= partial('packages/list.jade', {locals: {packages: packages}})

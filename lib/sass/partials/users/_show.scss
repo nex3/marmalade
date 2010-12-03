@@ -15,16 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "blueprint/reset";
-@import "partials/base";
-@import "blueprint";
+@import "compass/css3/border-radius";
+@import "compass/css3/gradient";
 
-@import "partials/style";
-@import "partials/page";
-@import "partials/layout";
-@import "partials/index";
-@import "partials/form";
-@import "partials/new";
-@import "partials/packages/list";
-@import "partials/packages/show";
-@import "partials/users/show";
+#main.users-show {
+  $padding: 2;
+  $img-columns: 3;
+  $header-columns: $blueprint-grid-columns - $img-columns - $padding;
+  .avatar {
+    @include column($img-columns);
+    @include pull($header-columns + $img-columns);
+
+    img {
+      @include linear-gradient(color-stops(darken($marmalade, 20%), black));
+      @include border-radius(5px);
+      padding: 5px;
+      border: 1px solid;
+    }
+  }
+
+  h2 {
+    @include column($header-columns);
+    @include prepend($img-columns + $padding);
+    line-height: 64px + 5px*2;
+    text-align: left;
+    font-size: 300%;
+  }
+}
