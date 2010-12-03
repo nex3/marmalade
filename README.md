@@ -40,3 +40,17 @@ Add this line to your `.emacs`:
 
 Your archive is now active! Run `M-x package-list` and see all the new packages,
 and run `M-x package-install` to install them.
+
+## PHILOSOPHY
+
+The primary goal of Marmalade is to make it easy to distribute Emacs Lisp code.
+Because Marmalade uses `package.el`'s package format, it's easy to package
+existing Elisp code. In addition, anyone can post packages to Marmalade, either
+[via the website](/packages/new) or [via the API](/docs/api.7.html).
+
+Emacs Lisp is unusual in that there's a lot of code out there that is useful but
+no longer actively maintained. To make this code more widely available, users
+are encouraged to upload even packages they didn't write (as long as those
+packages allow redistribution). Marmalade makes it easy to add the original
+author as an owner should they take an interest in the package.
+

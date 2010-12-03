@@ -15,17 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "blueprint/reset";
-@import "partials/base";
-@import "blueprint";
-
-@import "partials/style";
-@import "partials/page";
-@import "partials/layout";
-@import "partials/index";
-@import "partials/form";
-@import "partials/new";
-@import "partials/pages";
-@import "partials/packages/list";
-@import "partials/packages/show";
-@import "partials/users/show";
+#main[class^="pages"] {
+  $width: $blueprint-grid-columns*2/3;
+  @include column(floor($width));
+  @include prepend(floor(($blueprint-grid-columns - $width)/2));
+  font-size: 120%;
+}
