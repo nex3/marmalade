@@ -52,7 +52,8 @@
       $image-padding: 5px*2;
       $height: 21px;
       height: $height;
-      padding: ($image-height + $image-padding - $height)/2 inherit;
+      $padding: ($image-height + $image-padding - $height)/2;
+      padding: {top: $padding; bottom: $padding};
     }
 
     ul {
