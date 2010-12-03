@@ -91,4 +91,18 @@ body {
     margin-top: 1.5em;
     padding-bottom: 2em;
   }
+
+  footer {
+    @include column($blueprint-grid-columns);
+    border-top: 1px solid lighten(desaturate($marmalade, 50%), 40%);
+    padding: {top: 5px; bottom: 5px}
+    @include link-theme(gray);
+
+    a {
+      @include column(1);
+      @include pull(-1);
+      font-size: 120%;
+      text-decoration: none;
+    }
+  }
 }
