@@ -23,6 +23,11 @@ h2 Packages can be in one of two formats:
     | It may optionally include a "<code>Package-Requires</code>" header
     | containing a list of package/version pairs that this package depends on.
 
+  p
+    | For a more detailed specification, see the <a
+    | href="/doc-files/package.5.html#SINGLE-FILE-PACKAGES">package format
+    | documentation</a>.
+
   p For example:
   pre.elisp
     :preserve
@@ -42,8 +47,13 @@ h2 Packages can be in one of two formats:
 .filetype#tar
   h3 A <code>.tar</code> file containing many other files
   p
-    | The <code>.tar</code> file <strong>must</strong> contain a file
-    | named "<code><span class="variable">name</span>-pkg.el</code>".
+
+    | The <code>.tar</code> file <strong>must</strong> contain a single
+    | directory named "<code><span class="variable">name</span>-<span
+    | class="variable">version</span>/</code>". This directory
+    | <strong>must</strong> contain a file named "<code><span
+    | class="variable">name</span>-pkg.el</code>".
+
   p
     | This file must have a single call
     | to the <code class="elisp">`define-package'</code> function,
@@ -59,6 +69,12 @@ h2 Packages can be in one of two formats:
     li
       | <code class="elisp">`requirements'</code> (optional):
       | A quoted list of package/version pairs that this package depends on.
+
+  p
+    | For a more detailed specification, see the <a
+    | href="/doc-files/package.5.html#MULTI-FILE-PACKAGES">package format
+    | documentation</a>.
+
   p For example:
   pre.elisp
     :preserve
