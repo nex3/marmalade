@@ -44,6 +44,35 @@ username is case-insensitive, while the token is not.
 All requests that require authentication will return a 400 status if the
 authentication fails.
 
+## USERS
+
+Users are represented as objects with the following fields:
+
+* `name`: The string name of the user.
+* `packages`: A list of names of packages for which the user has the right to
+    post updates.
+* `created`: The date and time the user was created, as a timestamp integer.
+
+For example, the user object for `nex3` might look like:
+
+    {
+      name: "nex3",
+      packages: ["sass-mode", "haml-mode"],
+      created: 1291252865000
+    }
+
+### GET /v1/users/:name
+
+*Parameters*: `name`
+
+*Response*: `user`
+
+*Error Codes*: 404
+
+Gets the user object for a given user.
+
+This will have a 404 status if the user doesn't exist.
+
 ### POST /v1/users/login
 
 *Parameters*: `name`, `password`
