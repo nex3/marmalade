@@ -162,7 +162,8 @@ For example, the package for `sass-mode` might look like:
 
 Gets the package object for a given package, including *all* versions of that
 package. `package` should be the name of the package. If you only need a single
-version, `/v1/packages/:package/:version` is a better choice.
+version, `/v1/packages/:package/:version` or `/v1/packages/:package/latest` is a
+better choice.
 
 The response will have a 404 status if the package doesn't exist.
 
@@ -176,7 +177,24 @@ The response will have a 404 status if the package doesn't exist.
 *Error Codes*: 404
 
 Gets the package object for a given package with a single version of that
-package. `package` should be the name of the package.
+package. If you need the most recent version of the package, use
+`/v1/packages/:package/latest` instead. `package` should be the name of the
+package.
+
+The response will have a 404 status if the package doesn't exist or doesn't have
+the given version.
+
+
+### GET /v1/packages/:package/latest
+
+*Parameters*: `package`
+
+*Response*: `package`
+
+*Error Codes*: 404
+
+Gets the package object for a given package with the most recent (version-wise)
+version of that package. `package` should be the name of the package.
 
 The response will have a 404 status if the package doesn't exist or doesn't have
 the given version.
