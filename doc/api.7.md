@@ -152,6 +152,22 @@ For example, the package for `sass-mode` might look like:
     }
 
 
+### GET /v1/packages/:package
+
+*Parameters*: `package`
+
+*Response*: `package`
+
+*Error Codes*: 404
+
+Gets the package object for a given package, including *all* versions of that
+package. `package` should be the name of the package.
+
+Returns the package object, with all its versions.
+
+The response will have a 404 status if the package doesn't exist.
+
+
 ### POST /v1/packages
 
 *Parameters*: `name`, `token`, `package`
