@@ -27,8 +27,13 @@ h3.description= version.description
   - if (version.headers['author'])
     .label Author:
     .author= authorName(version.headers['author'])
+  - else
+    .label
+    .author
   - if (version.headers['url'])
     a(href=h(version.headers['url'])) Homepage
+  - else
+    a <!-- Homepage Placeholder -->
   a(href=h(packageDownloadPath(version))) Download
   .label.owners Owner#{_.keys(pkg.owners).length == 1 ? "" : "s"}:
   ul.owners
