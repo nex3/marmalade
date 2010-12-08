@@ -16,7 +16,7 @@
         "node-gravatar": "1.0.0"
     },
     "directories": { "lib": "./lib" },
-    "engines": { "node": "= 0.1.103" },
+    "engines": { "node": "= 0.2.5" },
     "bin": { "marmalade": "./bin/marmalade.js" },
     "man": [ "./man/marmalade.7", "./man/marmalade.1", "./man/api.7" ]
 }
