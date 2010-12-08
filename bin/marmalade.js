@@ -6,10 +6,12 @@ var optparse = require('optparse'),
 var parser = new optparse.OptionParser([
     ['-h', '--help', 'Show this help message'],
     ['-V', '--version', 'Show the Marmalade version'],
-    ['-p', '--port PORT', 'Port to run the server on (default 3000)']
+    ['-p', '--port PORT', 'Port to run the server on (default 3000)'],
+    ['--hostname HOSTNAME', 'Specify the hostname of the server']
 ]);
 
 var port = 3000;
+var hostname;
 
 parser.banner = "Usage: marmalade [OPTION]...\n" +
       "\n" +
@@ -33,6 +35,10 @@ parser.on('port', function(_, port_) {
     }
 });
 
+parser.on('hostname', function(_, hostname_) {
+    hostname = hostname_;
+});
+
 parser.on(2, function(a) {
     console.log(parser);
     process.exit(1);
@@ -41,7 +47,7 @@ parser.on(2, function(a) {
 parser.parse(process.argv);
 
 
-server.create(function(err, app) {
+server.create(hostname, function(err, app) {
     if (err) throw err;
     app.listen(port);
 });
