@@ -23,7 +23,7 @@ parser.on('help', function() {
 });
 
 parser.on('version', function() {
-    console.log('Marmalade 0.0.2');
+    console.log('Marmalade 0.0.3');
     process.exit();
 });
 
