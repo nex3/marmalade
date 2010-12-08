@@ -32,8 +32,8 @@
       |   First install <code>package.el</code></a>.
     li
       | Add to your <code>.emacs</code>:
-      | <code class="elisp">(add-to-list 'package-archives
-      |   <span class="sitename">"http://#{hostname}/packages"</span>)</code>
+      | <code class="elisp">(add-to-list 'package-archives '("marmalade" .
+      |     <span class="assoc-entry">"http://#{hostname}/packages"</span>))</code>
     li <code>C-x C-e</code> to evaluate it, and you're good to go!
 #packages
   a.add(href="/packages/new") Add Package
