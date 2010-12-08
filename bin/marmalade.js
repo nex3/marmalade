@@ -16,7 +16,7 @@ parser.banner = "Usage: marmalade [OPTION]...\n" +
       "An Emacs Lisp package server.";
 
 parser.on('help', function() {
-    console.log(parser);
+    console.log(String(parser));
     process.exit();
 });
 
