@@ -36,6 +36,10 @@
       font-size: 90%;
       letter-spacing: -1px;
     }
+    .sitename {
+      @include inline-block;
+      margin-left: 15px;
+    }
   }
 
   #packages {
