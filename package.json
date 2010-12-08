@@ -9,6 +9,7 @@
         "mongodb": "0.7.9",
         "connect": "0.2.4",
         "express": "1.0.0rc2",
+        "ejs": "0.0.3",
         "formidable": "0.9.7",
         "optparse": "1.0.1",
         "jade": "0.4.0",
