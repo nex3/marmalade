@@ -43,6 +43,20 @@ continues as though the error didn't happen.")
   "An assoc list of parameter names to values to send with the next request.
 Any parameters with nil values will not be included.")
 
+(defvar furl-request-files nil
+  "An assoc list of parameter names to information about files.
+These files will be uploaded in the next request.
+
+Each entry should be of the form (NAME FILENAME CONTENTS [MIME-TYPE]).
+NAME is the name of the parameter; the rest are self-explanatory.
+The MIME type defaults to \"application/octet-stream\".
+
+If this is non-nil for a POST, a Furl will do a multipart request.")
+
+(defun furl--get-boundary ()
+  "Get a string suitable for use as a multipart boundary."
+  (loop for x to 10 concat (format "%x" (random 500000000))))
+
 (defun furl--handle-errors (status)
   "Look for HTTP errors and handle any that are found.
 The actual handling of each error is done by `furl-error-function'."
@@ -66,6 +80,31 @@ Any parameters with nil values are ignored."
                 (url-hexify-string (format "%s" (cdr param))))))
     params "&")))
 
+(defun furl--make-multipart-data (boundary params files charset)
+  "Construct a multipart/form-data body string.
+BOUNDARY is the multipart boundary. PARAMS is an alist of normal
+parameters, while FILES is an alist of file parameters. CHARSET
+is the character set to declare for the files."
+  (let ((boundary (concat "--" boundary)))
+    (concat
+     (loop for (name . val) in params
+           concat
+           (concat boundary "\r\n"
+                   "Content-Disposition: form-data; "
+                   "name=\"" name "\"\r\n\r\n"
+                   val "\r\n"))
+     (loop for (name filename content mime-type) in files
+           concat
+           (concat boundary "\r\n"
+                   "Content-Disposition: form-data; "
+                   "name=\"" name "\"; "
+                   "filename=\"" filename "\"\r\n"
+                   "Content-Type: " mime-type "; "
+                   "charset=" charset "\r\n\r\n\r\n"
+                   content "\r\n"))
+     boundary "--\r\n")))
+
+
 (defun furl--get-response-body (&optional buffer)
   "Return the body of the response in BUFFER.
 BUFFER defaults to `current-buffer'."
@@ -84,16 +123,32 @@ preserved."
           (cons (cons ,name ,value) url-request-extra-headers)))
      ,@body))
 
-(defmacro furl--set-post-content-type (&rest body)
-  "Make sure POST requests are made properly.
+(defmacro furl--wrap-request (&rest body)
+  "Wrap a request to make sure all variables are set up properly.
 If a POST request is being made, set the Content-Type properly,
-including the charset."
+including the charset. If the POST includes files, set up the
+multipart request properly. For all requests, convert
+`furl-request-data' into the standard `url-request-data' format."
   (declare (indent 0))
-  `(if (equal url-request-method "POST")
-       (furl-with-header "Content-Type"
-           (format "application/x-www-form-urlencoded; charset=%s" furl-charset)
-         ,@body)
-     ,@body))
+  (let ((multipart-boundary (gensym)))
+    `(if (and (equal url-request-method "POST") furl-request-files)
+         (let* ((,multipart-boundary (furl--get-boundary))
+                (url-request-data (furl--make-multipart-data
+                                   ,multipart-boundary
+                                   furl-request-data
+                                   furl-request-files
+                                   furl-charset)))
+           (furl-with-header "Content-Type"
+               (format "multipart/form-data; boundary=%s; charset=%s"
+                       ,multipart-boundary furl-charset)
+             ,@body))
+       (let ((url-request-data
+              (or url-request-data (furl--make-query-string furl-request-data))))
+         (if (equal url-request-method "POST")
+             (furl-with-header "Content-Type"
+                 (format "application/x-www-form-urlencoded; charset=%s" furl-charset)
+               ,@body)
+           ,@body)))))
 
 (defun furl-retrieve (url callback)
   "Retrieve URL asynchronously and call CALLBACK when finished.
@@ -104,33 +159,31 @@ body of the retrieved document. CALLBACK is applied at an
 indeterminate point in a buffer containing the response.
 
 In addition to the variables that can be dynamically bound around
-`url-retrieve', `furl-silent', `furl-charset', and
+`url-retrieve', `furl-silent', `furl-charset',
+`furl-request-data', `furl-request-files', and
 `furl-error-function' can be dynamically bound around this
 function."
-  (furl--set-post-content-type
-    (let ((url-request-data
-           (or url-request-data (furl--make-query-string furl-request-data))))
-      (lexical-let ((furl-error-function- furl-error-function))
-        (url-retrieve url (lambda (status callback)
-                            (let ((furl-error-function furl-error-function-))
-                              (when (furl--handle-errors status)
-                                (funcall callback (furl--get-response-body)))))
-                      (list callback))))))
+  (furl--wrap-request
+    (lexical-let ((furl-error-function- furl-error-function))
+      (url-retrieve url (lambda (status callback)
+                          (let ((furl-error-function furl-error-function-))
+                            (when (furl--handle-errors status)
+                              (funcall callback (furl--get-response-body)))))
+                    (list callback)))))
 
 (defun furl-retrieve-synchronously (url)
   "Retrieve URL synchronously.
 URL is either a string or a parsed URL.
 
 In addition to the variables that can be dynamically bound around
-`url-retrieve-synchronously', `furl-silent', `furl-charset', and
+`url-retrieve-synchronously', `furl-silent', `furl-charset',
+`furl-request-data', `furl-request-files', and
 `furl-error-function' can be dynamically bound around this
 function."
-  (furl--set-post-content-type
-    (let ((url-request-data
-           (or url-request-data (furl--make-query-string furl-request-data))))
-      (with-current-buffer (url-retrieve-synchronously url)
-        (let ((str (furl--get-response-body)))
-          (kill-buffer)
-          str)))))
+  (furl--wrap-request
+    (with-current-buffer (url-retrieve-synchronously url)
+      (let ((str (furl--get-response-body)))
+        (kill-buffer)
+        str))))
 
 ;;; furl.el ends here
