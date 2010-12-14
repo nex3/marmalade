@@ -61,7 +61,8 @@ password for the first Marmalade request of each session."
 Like `furl-retrieve', but the result is passed to CALLBACK as a
 list of some sort."
   (let ((url-request-extra-headers
-         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers)))
+         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers))
+        (furl-error-function 'marmalade-handle-error))
     (lexical-let ((callback callback))
       (furl-retrieve (concat marmalade-server "/v1/" path)
                      (lambda (str)
@@ -72,8 +73,15 @@ list of some sort."
 Like `furl-retrieve-synchronously', but the result is returned as
 a list of some sort."
   (let ((url-request-extra-headers
-         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers)))
+         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers))
+        (furl-error-function 'marmalade-handle-error))
     (read (furl-retrieve-synchronously (concat marmalade-server "/v1/" path)))))
+
+(defun marmalade-handle-error (err info)
+  "Handle a Marmalade error by printing the response message."
+  (let ((msg (cdr (assoc 'message (read (furl--get-response-body))))))
+    (kill-buffer)
+    (error (concat "Marmalade error: " msg))))
 
 (defun marmalade-login (&optional callback)
   "Log in to Marmalade and get the authentication token.
@@ -89,6 +97,7 @@ authentication token."
            (url-request-method "POST")
            (furl-request-data `(("name" . ,name) ("password" . ,password))))
       (lexical-let ((callback callback))
+        (kill-buffer)
         (marmalade-retrieve
          "users/login"
          (lambda (res)
@@ -97,6 +106,5 @@ authentication token."
                  (customize-save-variable 'marmalade-token token)
                (setq marmalade-token token))
              (when callback (funcall callback token)))))))))
-
 
 ;;; marmalade.el ends here
