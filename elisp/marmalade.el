@@ -49,6 +49,13 @@
   :type 'string
   :group 'marmalade)
 
+(defcustom marmalade-token nil
+  "The authentication token for the Marmalade API.
+If this is not set, marmalade.el will prompt for username and
+password for the first Marmalade request of each session."
+  :type 'string
+  :group 'marmalade)
+
 (defun marmalade-retrieve (path callback)
   "Make a request to the Marmalade API at PATH.
 Like `furl-retrieve', but the result is passed to CALLBACK as a
@@ -74,17 +81,22 @@ Prompt interactively for the user's username and password, then
 use these to retreive the token.
 
 CALLBACK is called when the login is completed, and passed the
-authentication token and CBARGS."
+authentication token."
   (interactive)
-  (let* ((name (read-string "Marmalade username: "))
-         (password (read-passwd "Marmalade password: "))
-         (url-request-method "POST")
-         (furl-request-data `(("name" . ,name) ("password" . ,password))))
-    (lexical-let ((callback callback))
-      (marmalade-retrieve
-       "users/login"
-       (lambda (res)
-         (when callback (funcall callback (cdr (assoc 'token res)))))))))
+  (if marmalade-token (when callback (funcall callback marmalade-token))
+    (let* ((name (read-string "Marmalade username: "))
+           (password (read-passwd "Marmalade password: "))
+           (url-request-method "POST")
+           (furl-request-data `(("name" . ,name) ("password" . ,password))))
+      (lexical-let ((callback callback))
+        (marmalade-retrieve
+         "users/login"
+         (lambda (res)
+           (let ((token (cdr (assoc 'token res))))
+             (if (yes-or-no-p "Save Marmalade auth token? ")
+                 (customize-save-variable 'marmalade-token token)
+               (setq marmalade-token token))
+             (when callback (funcall callback token)))))))))
 
 
 ;;; marmalade.el ends here
