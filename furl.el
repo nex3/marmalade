@@ -63,6 +63,15 @@ Any parameters with nil values are ignored."
                 (url-hexify-string (cdr param)))))
     params "&")))
 
+(defmacro furl-with-header (name value &rest body)
+  "Set the HTTP header NAME to VALUE for requests within BODY.
+This sets the header so that other headers set elsewhere are
+preserved."
+  (declare (indent 2))
+  `(let ((url-request-extra-headers
+          (cons (cons ,name ,value) url-request-extra-headers)))
+     ,@body))
+
 (defun furl-retrieve (url callback)
   "Retrieve URL asynchronously and call CALLBACK when finished.
 URL is either a string or a parsed URL.
