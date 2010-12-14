@@ -62,8 +62,8 @@ Any parameters with nil values are ignored."
    (mapconcat
     (lambda (param)
       (when (cdr param)
-        (concat (url-hexify-string (car param)) "="
-                (url-hexify-string (cdr param)))))
+        (concat (url-hexify-string (format "%s" (car param))) "="
+                (url-hexify-string (format "%s" (cdr param))))))
     params "&")))
 
 (defun furl--get-response-body (&optional buffer)
