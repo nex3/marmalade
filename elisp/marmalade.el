@@ -96,10 +96,10 @@ authentication token."
            (url-request-method "POST")
            (furl-request-data `(("name" . ,name) ("password" . ,password))))
       (lexical-let ((callback callback))
-        (kill-buffer)
         (marmalade-retrieve
          "users/login"
          (lambda (res)
+           (kill-buffer)
            (let ((token (cdr (assoc 'token res))))
              (if (yes-or-no-p "Save Marmalade auth token? ")
                  (customize-save-variable 'marmalade-token token)
