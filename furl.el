@@ -66,6 +66,15 @@ Any parameters with nil values are ignored."
                 (url-hexify-string (cdr param)))))
     params "&")))
 
+(defun furl--get-response-body (&optional buffer)
+  "Return the body of the response in BUFFER.
+BUFFER defaults to `current-buffer'."
+  (with-current-buffer (or buffer (current-buffer))
+    (save-excursion
+      (goto-char (point-min))
+      (search-forward "\n\n" nil t) ; Move past headers
+      (buffer-substring-no-properties (point) (point-max)))))
+
 (defmacro furl-with-header (name value &rest body)
   "Set the HTTP header NAME to VALUE for requests within BODY.
 This sets the header so that other headers set elsewhere are
@@ -103,11 +112,7 @@ function."
            (or url-request-data (furl--make-query-string furl-request-data))))
       (url-retrieve url (lambda (status callback)
                           (when (furl--handle-errors status)
-                            (goto-char (point-min))
-                            (search-forward "\n\n" nil t) ; Move past headers
-                            (funcall callback
-                                     (buffer-substring-no-properties
-                                      (point) (point-max)))))
+                            (funcall callback (furl--get-response-body))))
                     (list callback)))))
 
 (defun furl-retrieve-synchronously (url)
@@ -122,9 +127,7 @@ function."
     (let ((url-request-data
            (or url-request-data (furl--make-query-string furl-request-data))))
       (with-current-buffer (url-retrieve-synchronously url)
-        (goto-char (point-min))
-        (search-forward "\n\n" nil t) ; Move past headers
-        (let ((str (buffer-substring-no-properties (point) (point-max))))
+        (let ((str (furl--get-response-body)))
           (kill-buffer)
           str)))))
 
