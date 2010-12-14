@@ -106,4 +106,11 @@ authentication token."
                (setq marmalade-token token))
              (when callback (funcall callback token)))))))))
 
+(defun marmalade-logout ()
+  "Log out of Marmalade.
+
+This does not remove a saved token."
+  (interactive)
+  (setq marmalade-token nil))
+
 ;;; marmalade.el ends here
