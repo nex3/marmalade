@@ -49,6 +49,13 @@
   :type 'string
   :group 'marmalade)
 
+(defcustom marmalade-username nil
+  "The Marmalade account username.
+If this is not set, marmalade.el will prompt for username and
+password for the first Marmalade request of each session."
+  :type 'string
+  :group 'marmalade)
+
 (defcustom marmalade-token nil
   "The authentication token for the Marmalade API.
 If this is not set, marmalade.el will prompt for username and
@@ -87,14 +94,15 @@ a list of some sort."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun marmalade-login (&optional callback)
-  "Log in to Marmalade and get the authentication token.
+  "Log in to Marmalade and get the username and authentication token.
 Prompt interactively for the user's username and password, then
 use these to retreive the token.
 
 CALLBACK is called when the login is completed, and passed the
-authentication token."
+username and the authentication token."
   (interactive)
-  (if marmalade-token (when callback (funcall callback marmalade-token))
+  (if (and marmalade-username marmalade-token)
+      (when callback (funcall callback marmalade-username marmalade-token))
     (let* ((name (read-string "Marmalade username: "))
            (password (read-passwd "Marmalade password: "))
            (url-request-method "POST")
@@ -104,18 +112,23 @@ authentication token."
          "users/login"
          (lambda (res)
            (kill-buffer)
-           (let ((token (cdr (assoc 'token res))))
-             (if (yes-or-no-p "Save Marmalade auth token? ")
-                 (customize-save-variable 'marmalade-token token)
+           (let ((token (cdr (assoc 'token res)))
+                 (name (cdr (assoc 'name res))))
+             (if (yes-or-no-p "Save Marmalade username and auth token? ")
+                 (progn
+                   (customize-save-variable 'marmalade-username name)
+                   (customize-save-variable 'marmalade-token token))
+               (setq marmalade-username name)
                (setq marmalade-token token))
-             (when callback (funcall callback token)))))))))
+             (when callback (funcall callback name token)))))))))
 
 (defun marmalade-logout ()
   "Log out of Marmalade.
 
 This does not remove a saved token."
   (interactive)
-  (setq marmalade-token nil))
+  (setq marmalade-token nil)
+  (setq marmalade-username nil))
 
 (defun marmalade-register (name email password &optional callback)
   "Register a user with NAME, EMAIL, and PASSWORD.
@@ -132,10 +145,14 @@ The authentication token is passed to CALLBACK."
        "users"
        (lambda (res)
          (kill-buffer)
-         (let ((token (cdr (assoc 'token res))))
-           (if (yes-or-no-p "Save Marmalade auth token? ")
-               (customize-save-variable 'marmalade-token token)
+         (let ((token (cdr (assoc 'token res)))
+               (name (cdr (assoc 'name res))))
+           (if (yes-or-no-p "Save Marmalade username and auth token? ")
+               (progn
+                 (customize-save-variable 'marmalade-username name)
+                 (customize-save-variable 'marmalade-token token))
+             (setq marmalade-username name)
              (setq marmalade-token token))
-           (when callback (funcall callback token))))))))
+           (when callback (funcall callback name token))))))))
 
 ;;; marmalade.el ends here
