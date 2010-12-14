@@ -113,4 +113,25 @@ This does not remove a saved token."
   (interactive)
   (setq marmalade-token nil))
 
+(defun marmalade-register (name email password &optional callback)
+  "Register a user with NAME, EMAIL, and PASSWORD.
+The authentication token is passed to CALLBACK."
+  (interactive
+   (list (read-string "Marmalade username: ")
+         (read-string "Email: ")
+         (read-passwd "Marmalade password: " 'confirm)))
+  (let ((url-request-method "POST")
+        (furl-request-data
+         `(("name" . ,name) ("email" . ,email) ("password" . ,password))))
+    (lexical-let ((callback callback))
+      (marmalade-retrieve
+       "users"
+       (lambda (res)
+         (kill-buffer)
+         (let ((token (cdr (assoc 'token res))))
+           (if (yes-or-no-p "Save Marmalade auth token? ")
+               (customize-save-variable 'marmalade-token token)
+             (setq marmalade-token token))
+           (when callback (funcall callback token))))))))
+
 ;;; marmalade.el ends here
