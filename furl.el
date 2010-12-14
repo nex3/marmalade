@@ -110,10 +110,12 @@ function."
   (furl--set-post-content-type
     (let ((url-request-data
            (or url-request-data (furl--make-query-string furl-request-data))))
-      (url-retrieve url (lambda (status callback)
-                          (when (furl--handle-errors status)
-                            (funcall callback (furl--get-response-body))))
-                    (list callback)))))
+      (lexical-let ((furl-error-function- furl-error-function))
+        (url-retrieve url (lambda (status callback)
+                            (let ((furl-error-function furl-error-function-))
+                              (when (furl--handle-errors status)
+                                (funcall callback (furl--get-response-body)))))
+                      (list callback))))))
 
 (defun furl-retrieve-synchronously (url)
   "Retrieve URL synchronously.
