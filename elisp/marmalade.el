@@ -60,22 +60,21 @@ password for the first Marmalade request of each session."
   "Make a request to the Marmalade API at PATH.
 Like `furl-retrieve', but the result is passed to CALLBACK as a
 list of some sort."
-  (let ((url-request-extra-headers
-         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers))
-        (furl-error-function 'marmalade-handle-error))
-    (lexical-let ((callback callback))
-      (furl-retrieve (concat marmalade-server "/v1/" path)
-                     (lambda (str)
-                       (funcall callback (read str)))))))
+  (furl-with-header "Accept" "text/x-script.elisp"
+    (let ((furl-error-function 'marmalade-handle-error))
+      (lexical-let ((callback callback))
+        (furl-retrieve (concat marmalade-server "/v1/" path)
+                       (lambda (str)
+                         (funcall callback (read str))))))))
 
 (defun marmalade-retrieve-synchronously (path)
   "Make a request to the Marmalade API at PATH.
 Like `furl-retrieve-synchronously', but the result is returned as
 a list of some sort."
-  (let ((url-request-extra-headers
-         (cons '("Accept" . "text/x-script.elisp") url-request-extra-headers))
-        (furl-error-function 'marmalade-handle-error))
-    (read (furl-retrieve-synchronously (concat marmalade-server "/v1/" path)))))
+  (furl-with-header "Accept" "text/x-script.elisp"
+    (let ((furl-error-function 'marmalade-handle-error))
+      (read (furl-retrieve-synchronously
+             (concat marmalade-server "/v1/" path))))))
 
 (defun marmalade-handle-error (err info)
   "Handle a Marmalade error by printing the response message."
