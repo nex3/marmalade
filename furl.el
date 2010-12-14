@@ -43,7 +43,7 @@ continues as though the error didn't happen.")
   "An assoc list of parameter names to values to send with the next request.
 Any parameters with nil values will not be included.")
 
-(defun furl-handle-errors (status)
+(defun furl--handle-errors (status)
   "Look for HTTP errors and handle any that are found.
 The actual handling of each error is done by `furl-error-function'."
   (loop for (name val) on status by 'cddr
@@ -52,7 +52,7 @@ The actual handling of each error is done by `furl-error-function'."
             return nil)
   t)
 
-(defun furl-make-query-string (params)
+(defun furl--make-query-string (params)
   "Return a query string constructed from PARAMS.
 PARAMS is an assoc list of parameter names to values.
 
@@ -75,7 +75,7 @@ preserved."
           (cons (cons ,name ,value) url-request-extra-headers)))
      ,@body))
 
-(defmacro furl-set-post-content-type (&rest body)
+(defmacro furl--set-post-content-type (&rest body)
   "Make sure POST requests are made properly.
 If a POST request is being made, set the Content-Type properly,
 including the charset."
@@ -98,11 +98,11 @@ In addition to the variables that can be dynamically bound around
 `url-retrieve', `furl-silent', `furl-charset', and
 `furl-error-function' can be dynamically bound around this
 function."
-  (furl-set-post-content-type
+  (furl--set-post-content-type
     (let ((url-request-data
-           (or url-request-data (furl-make-query-string furl-request-data))))
+           (or url-request-data (furl--make-query-string furl-request-data))))
       (url-retrieve url (lambda (status callback)
-                          (when (furl-handle-errors status)
+                          (when (furl--handle-errors status)
                             (goto-char (point-min))
                             (search-forward "\n\n" nil t) ; Move past headers
                             (funcall callback
@@ -118,9 +118,9 @@ In addition to the variables that can be dynamically bound around
 `url-retrieve-synchronously', `furl-silent', `furl-charset', and
 `furl-error-function' can be dynamically bound around this
 function."
-  (furl-set-post-content-type
+  (furl--set-post-content-type
     (let ((url-request-data
-           (or url-request-data (furl-make-query-string furl-request-data))))
+           (or url-request-data (furl--make-query-string furl-request-data))))
       (with-current-buffer (url-retrieve-synchronously url)
         (goto-char (point-min))
         (search-forward "\n\n" nil t) ; Move past headers
