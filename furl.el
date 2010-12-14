@@ -27,6 +27,9 @@ Only works in Emacs 24 and later.
 
 TODO: Currently this has no effect.")
 
+(defvar furl-charset "utf-8"
+  "The character set to declare for POST requests.")
+
 (defvar furl-error-function 'signal
   "Called when there is an error retrieving a URL.
 Passed ERROR-SYMBOL and DATA, as would be passed to `signal'.
@@ -72,6 +75,17 @@ preserved."
           (cons (cons ,name ,value) url-request-extra-headers)))
      ,@body))
 
+(defmacro furl-set-post-content-type (&rest body)
+  "Make sure POST requests are made properly.
+If a POST request is being made, set the Content-Type properly,
+including the charset."
+  (declare (indent 0))
+  `(if (equal url-request-method "POST")
+       (furl-with-header "Content-Type"
+           (format "application/x-www-form-urlencoded; charset=%s" furl-charset)
+         ,@body)
+     ,@body))
+
 (defun furl-retrieve (url callback)
   "Retrieve URL asynchronously and call CALLBACK when finished.
 URL is either a string or a parsed URL.
@@ -81,33 +95,37 @@ body of the retrieved document. CALLBACK is applied at an
 indeterminate point in a buffer containing the response.
 
 In addition to the variables that can be dynamically bound around
-`url-retrieve', `furl-silent' and `furl-error-function' can be
-dynamically bound around this function."
-  (let ((url-request-data
-         (or url-request-data (furl-make-query-string furl-request-data))))
-    (url-retrieve url (lambda (status callback)
-                        (when (furl-handle-errors status)
-                          (goto-char (point-min))
-                          (search-forward "\n\n" nil t) ; Move past headers
-                          (funcall callback
-                                   (buffer-substring-no-properties
-                                    (point) (point-max)))))
-                  (list callback))))
+`url-retrieve', `furl-silent', `furl-charset', and
+`furl-error-function' can be dynamically bound around this
+function."
+  (furl-set-post-content-type
+    (let ((url-request-data
+           (or url-request-data (furl-make-query-string furl-request-data))))
+      (url-retrieve url (lambda (status callback)
+                          (when (furl-handle-errors status)
+                            (goto-char (point-min))
+                            (search-forward "\n\n" nil t) ; Move past headers
+                            (funcall callback
+                                     (buffer-substring-no-properties
+                                      (point) (point-max)))))
+                    (list callback)))))
 
 (defun furl-retrieve-synchronously (url)
   "Retrieve URL synchronously.
 URL is either a string or a parsed URL.
 
 In addition to the variables that can be dynamically bound around
-`url-retrieve-synchronously', `furl-silent' and `furl-error-function' can be
-dynamically bound around this function."
-  (let ((url-request-data
-         (or url-request-data (furl-make-query-string furl-request-data))))
-    (with-current-buffer (url-retrieve-synchronously url)
-      (goto-char (point-min))
-      (search-forward "\n\n" nil t) ; Move past headers
-      (let ((str (buffer-substring-no-properties (point) (point-max))))
-        (kill-buffer)
-        str))))
+`url-retrieve-synchronously', `furl-silent', `furl-charset', and
+`furl-error-function' can be dynamically bound around this
+function."
+  (furl-set-post-content-type
+    (let ((url-request-data
+           (or url-request-data (furl-make-query-string furl-request-data))))
+      (with-current-buffer (url-retrieve-synchronously url)
+        (goto-char (point-min))
+        (search-forward "\n\n" nil t) ; Move past headers
+        (let ((str (buffer-substring-no-properties (point) (point-max))))
+          (kill-buffer)
+          str)))))
 
 ;;; furl.el ends here
