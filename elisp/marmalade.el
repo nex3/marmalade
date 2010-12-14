@@ -82,6 +82,10 @@ a list of some sort."
     (kill-buffer)
     (error (concat "Marmalade error: " msg))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; User Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun marmalade-login (&optional callback)
   "Log in to Marmalade and get the authentication token.
 Prompt interactively for the user's username and password, then
