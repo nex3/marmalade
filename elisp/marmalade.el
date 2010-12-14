@@ -155,4 +155,33 @@ The authentication token is passed to CALLBACK."
              (setq marmalade-token token))
            (when callback (funcall callback name token))))))))
 
+(defun marmalade-upload-buffer (buffer &optional callback)
+  "Upload the package in BUFFER.
+BUFFER should be visiting an Elisp file or a tarball.
+
+CALLBACK is called with the package object once the package is
+uploaded."
+  (interactive "bBuffer to upload: ")
+  (with-current-buffer buffer
+    (lexical-let ((callback callback))
+      (marmalade-login
+       (lambda (name tok)
+         (let ((url-request-method "POST")
+               (furl-request-data `(("name" . ,name) ("token" . ,tok)))
+               (furl-request-files
+                `(("package" ,(file-name-nondirectory (buffer-file-name))
+                   ,(with-current-buffer
+                        (if (tar-data-swapped-p) tar-data-buffer (current-buffer))
+                      (buffer-string))
+                   ,(cond
+                     ((eq major-mode 'emacs-lisp-mode) "text/x-script.elisp")
+                     ((eq major-mode 'tar-mode) "application/x-tar")
+                     (t "application/octet-stream"))))))
+           (marmalade-retrieve
+            "packages"
+            (lambda (res)
+              (kill-buffer)
+              (when callback (funcall callback (cdr (assoc 'package res))))))))))))
+
+
 ;;; marmalade.el ends here
