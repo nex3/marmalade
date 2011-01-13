@@ -5,7 +5,7 @@
 ;; Author: Nathan Weizenbaum <nweiz@google.com>
 ;; URL: http://code.google.com/p/marmalade
 ;; Version: 0.0.3
-;; Package-Requires: ((furl "0.0.1"))
+;; Package-Requires: ((furl "0.0.2"))
 
 ;;; Commentary:
 
