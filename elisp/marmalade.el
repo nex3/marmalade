@@ -171,7 +171,9 @@ uploaded."
                (furl-request-files
                 `(("package" ,(file-name-nondirectory (buffer-file-name))
                    ,(with-current-buffer
-                        (if (tar-data-swapped-p) tar-data-buffer (current-buffer))
+                        (if (and (eq major-mode 'tar-mode) (tar-data-swapped-p))
+                            tar-data-buffer
+                          (current-buffer))
                       (buffer-string))
                    ,(cond
                      ((eq major-mode 'emacs-lisp-mode) "text/x-script.elisp")
