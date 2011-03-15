@@ -85,7 +85,9 @@ a list of some sort."
 
 (defun marmalade-handle-error (err info)
   "Handle a Marmalade error by printing the response message."
-  (let ((msg (cdr (assoc 'message (read (furl--get-response-body))))))
+  (let* ((body (furl--get-response-body))
+         (msg (condition-case err (cdr (assoc 'message (read body)))
+                (error (format "parsing error %S for %S" err body)))))
     (kill-buffer)
     (error (concat "Marmalade error: " msg))))
 
