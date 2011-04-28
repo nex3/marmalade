@@ -16,25 +16,30 @@
 
 h2
   span.name= pkg.name
-  = " "
-  span.version= version.version.join('.')
+  - if (version)
+    = " "
+    span.version= version.version.join('.')
 
-h3.description= version.description
+- if (version)
+  h3.description= version.description
 
 .metadata
   .label Install:
   pre M-x package-install #{pkg.name}
-  - if (version.headers['author'])
+  - if (version && version.headers['author'])
     .label Author:
     .author= authorName(version.headers['author'])
   - else
     .label
     .author
-  - if (version.headers['url'])
+  - if (version && version.headers['url'])
     a(href=h(version.headers['url'])) Homepage
   - else
     a <!-- Homepage Placeholder -->
-  a(href=h(packageDownloadPath(version))) Download
+  - if (version)
+    a(href=h(packageDownloadPath(version))) Download
+  - else
+    a <!-- Download Placeholder -->
   .label.owners Owner#{_.keys(pkg.owners).length == 1 ? "" : "s"}:
   ul.owners
     - each email, owner in pkg.owners
@@ -45,5 +50,5 @@ h3.description= version.description
       li.add
         a(href=currentUrl + '/owners/new') Add Owner
 
-- if (version.commentary)
+- if (version && version.commentary)
   .commentary!= formatText(version.commentary)
