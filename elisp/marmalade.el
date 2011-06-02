@@ -95,6 +95,7 @@ a list of some sort."
 ;;; User Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;###autoload
 (defun marmalade-login (&optional callback)
   "Log in to Marmalade and get the username and authentication token.
 Prompt interactively for the user's username and password, then
@@ -132,6 +133,7 @@ This does not remove a saved token."
   (setq marmalade-token nil)
   (setq marmalade-username nil))
 
+;;;###autoload
 (defun marmalade-register (name email password &optional callback)
   "Register a user with NAME, EMAIL, and PASSWORD.
 The authentication token is passed to CALLBACK."
@@ -157,6 +159,7 @@ The authentication token is passed to CALLBACK."
              (setq marmalade-token token))
            (when callback (funcall callback name token))))))))
 
+;;;###autoload
 (defun marmalade-upload-buffer (buffer &optional callback)
   "Upload the package in BUFFER.
 BUFFER should be visiting an Elisp file or a tarball.
