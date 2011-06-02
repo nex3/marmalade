@@ -44,7 +44,7 @@
   :prefix "marmalade-"
   :group 'applications)
 
-(defcustom marmalade-server nil
+(defcustom marmalade-server "http://marmalade-repo.org"
   "The URL of the server to which to upload packages."
   :type 'string
   :group 'marmalade)
