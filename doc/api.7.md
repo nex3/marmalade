@@ -268,7 +268,23 @@ Deletes a specific version of a package.
 The response will have a 400 status if any parameters are improperly formatted.
 
 The response will have a 403 status if the username and token are valid, but the
-user in question doesn't have permission to add owners to this package.
+user in question doesn't have permission to delete versions of this package.
+
+
+### DELETE /v1/packages/:package
+
+*Parameters*: `name`, `token`, `package`
+
+*Error Codes*: 400, 403
+
+Delete all versions of a package.
+
+`package` should be the name of the package.
+
+The response will have a 400 status if any parameters are improperly formatted.
+
+The response will have a 403 status if the username and token are valid, but the
+user in question doesn't have permission to delete this package.
 
 
 ### POST /v1/packages/:package/owners
