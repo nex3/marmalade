@@ -49,6 +49,10 @@ h2
     - if (ownsPackage)
       li.add
         a(href=currentUrl + '/owners/new') Add Owner
+  - if (ownsPackage)
+    form(accept-charset="utf-8", action="/packages/" + pkg._name + "/" + (version ? version.version.join('.') : ''), method="post").delete.normal
+      input(type="hidden", name="_method", value="delete")
+      input(type="submit", value=(version ? "Delete Version" : "Delete Package"))
 
 - if (version && version.commentary)
   .commentary!= formatText(version.commentary)
