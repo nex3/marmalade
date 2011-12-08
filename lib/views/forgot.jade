@@ -14,11 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-form(accept-charset="utf-8", class="login", method="post")
+form(accept-charset="utf-8", class="forgot", method="post")
   label(for="name") Username
   input(name="name", id="username", type="text")
-  label(for="password")
-    | Password
-    a.annotation(href="/forgot") (Forgot)
-  input(name="password", id="password", type="password")
-  input(type="submit", value="Sign In")
+  input(type="submit", value="Reset Password")
