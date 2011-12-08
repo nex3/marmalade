@@ -4,20 +4,20 @@
     "version": "0.0.3",
     "author": "Nathan Weizenbaum <nweiz@google.com>",
     "dependencies": {
-        "step": "0.0.3",
-        "underscore": "1.0.4",
-        "mongodb": "0.7.9",
-        "connect": "0.2.4",
-        "express": "1.0.0rc2",
-        "ejs": "0.0.3",
-        "formidable": "0.9.7",
-        "optparse": "1.0.1",
-        "jade": "0.4.0",
-        "email": "0.1.0",
-        "node-gravatar": "1.0.0"
+        "step": "0.0.5",
+        "underscore": "1.2.2",
+        "mongodb": "0.9.7-1.4",
+        "connect": "1.8.1",
+        "mime": "1.2.4",
+        "express": "2.5.1",
+        "ejs": "0.5.0",
+        "optparse": "1.0.3",
+        "jade": "0.19.0",
+        "email": "0.2.4",
+        "node-gravatar": "1.0.0",
+        "connect-gzip": "0.1.5"
     },
-    "directories": { "lib": "./lib" },
-    "engines": { "node": "= 0.2.5" },
-    "bin": { "marmalade": "./bin/marmalade.js" },
-    "man": [ "./man/marmalade.7", "./man/marmalade.1", "./man/api.7" ]
+    "directories": { "lib": "./lib", "doc": "./doc", "man": "./man" },
+    "engines": { "node": "= 0.6.0" },
+    "scripts": { "start": "node marmalade.js" }
 }

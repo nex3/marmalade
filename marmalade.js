@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var optparse = require('optparse'),
-    server = require('marmalade/server');
+    server = require('./lib/server');
 
 var parser = new optparse.OptionParser([
     ['-h', '--help', 'Show this help message'],
