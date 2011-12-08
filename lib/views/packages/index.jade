@@ -25,8 +25,12 @@
       li
         a(href="/packages/" + h(package._name))
           .name= package.name
-          .version= package._latestVersion.version.join('.')
-          .description= package._latestVersion.description
+          - if (package._latestVersion)
+            .version= package._latestVersion.version.join('.')
+            .description= package._latestVersion.description
+          - else
+            .version
+            .description
 
   - if (page != 0)
     a.prev(href=h(pagePath(page - 1))) Previous

@@ -17,7 +17,7 @@
 
 @import "compass/css3/box-sizing";
 
-#main form {
+#main form:not(.normal) {
   $padding: $blueprint-grid-columns/4;
   $form-width: $blueprint-grid-columns - $padding*2;
   @include column($form-width);

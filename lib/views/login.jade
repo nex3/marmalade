@@ -17,6 +17,8 @@
 form(accept-charset="utf-8", class="login", method="post")
   label(for="name") Username
   input(name="name", id="username", type="text")
-  label(for="password") Password
+  label(for="password")
+    | Password
+    a.annotation(href="/forgot") (Forgot)
   input(name="password", id="password", type="password")
   input(type="submit", value="Sign In")

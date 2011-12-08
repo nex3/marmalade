@@ -14,8 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-h2= user.name
-.avatar
-  img(src=gravatar(user.email), alt=user.name)
-
-!= partial('packages/list.jade')
+ol#packages
+  - each package in packages
+    li
+      a(href="/packages/" + h(package._name))
+        .name= package.name
+        - if (package._latestVersion)
+          .version= package._latestVersion.version.join('.')
+          .description= package._latestVersion.description
+        - else
+          .version
+          .description

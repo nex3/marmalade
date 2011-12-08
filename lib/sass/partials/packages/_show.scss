@@ -57,6 +57,15 @@
       padding: {top: $padding; bottom: $padding};
     }
 
+    .delete {
+      @include column(3);
+
+      input[type="submit"] {
+        width: 100%;
+        margin-top: 20px;
+      }
+    }
+
     ul {
       margin: 0;
       li {

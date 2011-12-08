@@ -4,8 +4,8 @@
 
 ;; Author: Nathan Weizenbaum <nweiz@google.com>
 ;; URL: http://code.google.com/p/marmalade
-;; Version: 0.0.3
-;; Package-Requires: ((furl "0.0.1"))
+;; Version: 0.0.4
+;; Package-Requires: ((furl "0.0.2"))
 
 ;;; Commentary:
 
@@ -44,7 +44,7 @@
   :prefix "marmalade-"
   :group 'applications)
 
-(defcustom marmalade-server nil
+(defcustom marmalade-server "http://marmalade-repo.org"
   "The URL of the server to which to upload packages."
   :type 'string
   :group 'marmalade)
@@ -85,7 +85,9 @@ a list of some sort."
 
 (defun marmalade-handle-error (err info)
   "Handle a Marmalade error by printing the response message."
-  (let ((msg (cdr (assoc 'message (read (furl--get-response-body))))))
+  (let* ((body (furl--get-response-body))
+         (msg (condition-case err (cdr (assoc 'message (read body)))
+                (error (format "parsing error %S for %S" err body)))))
     (kill-buffer)
     (error (concat "Marmalade error: " msg))))
 
@@ -93,6 +95,7 @@ a list of some sort."
 ;;; User Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;###autoload
 (defun marmalade-login (&optional callback)
   "Log in to Marmalade and get the username and authentication token.
 Prompt interactively for the user's username and password, then
@@ -130,6 +133,7 @@ This does not remove a saved token."
   (setq marmalade-token nil)
   (setq marmalade-username nil))
 
+;;;###autoload
 (defun marmalade-register (name email password &optional callback)
   "Register a user with NAME, EMAIL, and PASSWORD.
 The authentication token is passed to CALLBACK."
@@ -155,6 +159,7 @@ The authentication token is passed to CALLBACK."
              (setq marmalade-token token))
            (when callback (funcall callback name token))))))))
 
+;;;###autoload
 (defun marmalade-upload-buffer (buffer &optional callback)
   "Upload the package in BUFFER.
 BUFFER should be visiting an Elisp file or a tarball.
@@ -171,7 +176,9 @@ uploaded."
                (furl-request-files
                 `(("package" ,(file-name-nondirectory (buffer-file-name))
                    ,(with-current-buffer
-                        (if (tar-data-swapped-p) tar-data-buffer (current-buffer))
+                        (if (and (eq major-mode 'tar-mode) (tar-data-swapped-p))
+                            tar-data-buffer
+                          (current-buffer))
                       (buffer-string))
                    ,(cond
                      ((eq major-mode 'emacs-lisp-mode) "text/x-script.elisp")

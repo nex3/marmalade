@@ -14,10 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-ol#packages
-  - each package in packages
-    li
-      a(href="/packages/" + h(package._name))
-        .name= package.name
-        .version= package._latestVersion.version.join('.')
-        .description= package._latestVersion.description
+form(accept-charset="utf-8", class="forgot", method="post")
+  label(for="name") Username
+  input(name="name", id="username", type="text")
+  input(type="submit", value="Reset Password")
