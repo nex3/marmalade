@@ -1,7 +1,7 @@
 {
     "name": "marmalade",
     "description": "An Emacs Lisp package server.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": "Nathan Weizenbaum <nweiz@google.com>",
     "dependencies": {
         "step": "0.0.5",
