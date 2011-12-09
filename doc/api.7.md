@@ -89,15 +89,14 @@ This will have a 400 status if the username or password is wrong.
 
 ### POST /v1/users/reset
 
-*Parameters*: `name`
+*Parameters*: `email`
 
 *Error Codes*: 400
 
 Resets a user's password. This generates a new, random password for the
-user and sends that password to the email the user provided during
-registration.
+user and sends that password to the given email.
 
-This will have a 400 status if the username isn't registered.
+This will have a 400 status if the email isn't registered.
 
 ### POST /v1/users
 
